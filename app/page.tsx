@@ -3,12 +3,13 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
+const SWAP_URL = "https://swap.gbkai.com";
 const EARN_URL = "https://app.gbkai.com/#earn";
 
 const nav = [
   ["Overview", "/", "⌂"],
   ["Founders", "#programs", "♙"],
-  ["GBK Swap", "https://app.gbkai.com", "↔"],
+  ["GBK Swap", SWAP_URL, "↔"],
   ["Referrals", "#referrals", "◎"],
   ["Merchants", "#merchants", "▦"],
   ["AI Marketplace", "#marketplace", "✦"],
@@ -331,6 +332,9 @@ export default function Home() {
       <section className="content">
         <header className="top">
           <div><div className="crumb">GBK ECOSYSTEM / FOUNDER COMMUNITY</div><h1>Founder Dashboard</h1><p>Coordinate global founders, community growth and ecosystem participation.</p></div>
+          <div className="topWallet">
+            {wallet ? <button className="hubBtn" type="button" onClick={disconnectWallet}>✓ {shortWallet}</button> : <button className="primary" type="button" onClick={connectWallet}>🔗 Connect Wallet</button>}
+          </div>
         </header>
 
         <div className="hero">
@@ -339,7 +343,7 @@ export default function Home() {
             <h2>GBK: Blockchain + AI +<br/><em>Real-World Utility</em></h2>
             <p>Connect founders, merchants, builders and communities across countries while exploring the GBK ecosystem.</p>
             <div className="heroBtns"><a className="secondary" href="#install">📲 Add to Home Screen</a>
-              <a className="primary" href="https://app.gbkai.com" target="_blank" rel="noreferrer">↔ Swap GBK Easily ↗</a>
+              <a className="primary" href={SWAP_URL} target="_blank" rel="noreferrer">↔ Swap GBK Easily ↗</a>
               <a className="secondary" href="#benefits">View Founder Benefits</a>
               <a className="secondary" href="/api/gbk-future-guide">📄 Download 10-Page GBK Guide — Pattaya</a>
             </div>
@@ -362,7 +366,7 @@ export default function Home() {
             <a className="ecoCard ecoToken" href="#daily-rewards">
               <span className="ecoIcon">🪙</span><div><b>HOLD GBK</b><small>Token holders can explore the applicable GBK token-reward mechanism and ecosystem utilities.</small></div><strong>Explore →</strong>
             </a>
-            <a className="ecoCard ecoSwap" href="https://app.gbkai.com" target="_blank" rel="noreferrer">
+            <a className="ecoCard ecoSwap" href={SWAP_URL} target="_blank" rel="noreferrer">
               <span className="ecoIcon">🔄</span><div><b>USE GBK</b><small>Open the supported GBK swap and ecosystem application.</small></div><strong>Open →</strong>
             </a>
             <a className="ecoCard ecoFounder" href="#global-founder">
@@ -460,7 +464,7 @@ export default function Home() {
           </div>
           <div className="confirmationCard">
             <div><b>Selected membership</b><strong>{selectedTier ? `${membershipTiers[selectedTier].title} · ${membershipTiers[selectedTier].amount}` : "Choose a membership level above"}</strong><small>Membership verification uses the selected USD threshold; no private key or seed phrase is requested.</small></div>
-            <a className="primary" href={EARN_URL} target="_blank" rel="noreferrer">{selectedTier ? `Continue to Earn & PancakeSwap ↗` : "Open Earn & PancakeSwap ↗"}</a>
+            <a className="primary" href={SWAP_URL} target="_blank" rel="noreferrer">{selectedTier ? `Continue to GBK Swap ↗` : "Open GBK Swap ↗"}</a>
           </div>
           <div className="confirmationFields">
             <div><span>Verification status</span><b>{verificationStatus}</b></div>
@@ -507,12 +511,12 @@ export default function Home() {
                 <div>
                   <span className="earnBadge">WALLET CONNECTED</span>
                   <b>💰 L1 / L2 Earn & Referral</b>
-                  <small>Use the same connected wallet on app.gbkai.com to open the GBK Earn & Referral area and access your referral activity.</small>
+                  <small>Use the same connected wallet on GBK Swap for the swap, then use the GBK Earn dashboard for referral activity and reward status.</small>
                   <div className="earnLevels"><span><strong>L1</strong> 6%</span><span><strong>L2</strong> 2%</span></div>
                 </div>
                 <div className="earnActions">
-                  <a className="primary" href={EARN_URL} target="_blank" rel="noreferrer">Open Earn & Referral ↗</a>
-                  <a className="hubBtn" href="https://pancakeswap.finance" target="_blank" rel="noreferrer">PancakeSwap ↗</a>
+                  <a className="primary" href={SWAP_URL} target="_blank" rel="noreferrer">Open GBK Swap ↗</a>
+                  <a className="hubBtn" href={EARN_URL} target="_blank" rel="noreferrer">Earn Dashboard ↗</a>
                 </div>
               </div>
               <div className="founderReferralLinkBox">
@@ -546,7 +550,7 @@ export default function Home() {
             </div>
             <div className="quickBuyAction">
               <b>{!wallet ? "Connect wallet to continue" : selectedTier ? `Selected: ${membershipTiers[selectedTier].title} · ${membershipTiers[selectedTier].amount}` : "Choose a membership level"}</b>
-              <button className="primary" type="button" disabled={!wallet || !selectedTier} onClick={() => { if (selectedTier) { setVerificationStatus("Earn & PancakeSwap route ready — complete the selected amount."); window.open(EARN_URL, "_blank", "noopener,noreferrer"); document.getElementById("swap-confirmation")?.scrollIntoView({ behavior: "smooth" }); } }}>Continue to Payment →</button>
+              <button className="primary" type="button" disabled={!wallet || !selectedTier} onClick={() => { if (selectedTier) { setVerificationStatus("GBK Swap route ready — complete the selected amount with Auto Slippage."); window.open(SWAP_URL, "_blank", "noopener,noreferrer"); document.getElementById("swap-confirmation")?.scrollIntoView({ behavior: "smooth" }); } }}>Continue to Payment →</button>
             </div>
           </div>
           <div className="coreGrid">
@@ -578,7 +582,7 @@ export default function Home() {
 
         <section className="panel founderHub" id="founder-hub"><div className="panelHead"><div><h3>🚀 Founder Workspace</h3><p>Share GBK content, invite genuine community members and track your campaign activity.</p></div><span className="badge">FOUNDER TOOLS</span></div><div className="hubGrid"><div className="hubCard"><b>🔗 Your GBK Share Link</b><small>Use the official ecosystem entry point when sharing. Copy it once, then post through your own social accounts.</small><button className="hubBtn" onClick={() => navigator.clipboard?.writeText("https://app.gbkai.com")}>Copy GBK Link</button></div><div className="hubCard"><b>📣 Social Share</b><small>Share the GBK ecosystem through supported social platforms. Review content before posting.</small><div className="shareRow"><a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fapp.gbkai.com" target="_blank" rel="noreferrer">Facebook</a><a href="https://twitter.com/intent/tweet?url=https%3A%2F%2Fapp.gbkai.com&text=Explore%20the%20GBK%20ecosystem" target="_blank" rel="noreferrer">X</a><a href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fapp.gbkai.com" target="_blank" rel="noreferrer">LinkedIn</a><a href="https://wa.me/?text=Explore%20the%20GBK%20ecosystem%20https%3A%2F%2Fapp.gbkai.com" target="_blank" rel="noreferrer">WhatsApp</a></div></div><div className="hubCard"><b>🎬 Short Video Hub</b><small>Ready-to-share topics: What is GBK? · How GBK Swap works · Buy & Hold · AI Marketplace · Learn · Agri.</small><Link className="hubBtn" href="/tools">Open Content Studio →</Link></div><div className="hubCard"><b>📊 Founder Analytics</b><small>Track content reach, website visits, wallet connections, successful swaps and returning users once live analytics is connected.</small><Link className="hubBtn" href="/tools">Open Analytics →</Link></div></div></section>
 
-        <section className="panel referralPanel" id="referrals"><div className="panelHead"><div><h3>🔗 Referral Benefits · app.gbkai.com</h3><p>Referral program participation through the GBK ecosystem.</p></div><span className="badge">L1 + L2</span></div><div className="refGrid"><div className="refCard"><span>L1</span><strong>6%</strong><p>Direct referral reward</p><small>Eligible activity only</small></div><div className="refCard"><span>L2</span><strong>2%</strong><p>Second-level referral reward</p><small>Eligible activity only</small></div><div className="refFlow"><b>Connect Wallet</b><i>→</i><b>Get Referral Link</b><i>→</i><b>Invite Genuine Users</b><i>→</i><b>Eligible Swap</b><i>→</i><b>Reward Recorded</b></div></div><div className="notice">Referral rewards are subject to app.gbkai.com program rules, eligibility, completed qualifying transactions and applicable terms. No guaranteed income. No self-referrals, duplicate/fake accounts or spam.</div><div className="refActions"><a href="https://app.gbkai.com" target="_blank" rel="noreferrer">Open app.gbkai.com ↗</a><a href={EARN_URL} target="_blank" rel="noreferrer">Get Referral Link ↗</a></div></section>
+        <section className="panel referralPanel" id="referrals"><div className="panelHead"><div><h3>🔗 Referral Benefits · app.gbkai.com</h3><p>Referral program participation through the GBK ecosystem.</p></div><span className="badge">L1 + L2</span></div><div className="refGrid"><div className="refCard"><span>L1</span><strong>6%</strong><p>Direct referral reward</p><small>Eligible activity only</small></div><div className="refCard"><span>L2</span><strong>2%</strong><p>Second-level referral reward</p><small>Eligible activity only</small></div><div className="refFlow"><b>Connect Wallet</b><i>→</i><b>Get Referral Link</b><i>→</i><b>Invite Genuine Users</b><i>→</i><b>Eligible Swap</b><i>→</i><b>Reward Recorded</b></div></div><div className="notice">Referral rewards are subject to app.gbkai.com program rules, eligibility, completed qualifying transactions and applicable terms. No guaranteed income. No self-referrals, duplicate/fake accounts or spam.</div><div className="refActions"><a href={SWAP_URL} target="_blank" rel="noreferrer">Open GBK Swap ↗</a><a href={EARN_URL} target="_blank" rel="noreferrer">Open Earn ↗</a></div></section>
 
         <section className="panel anchorPanel" id="merchants"><h3>🏪 Merchant Ecosystem</h3><p>Connect with participating merchants and explore GBK marketplace opportunities.</p></section>
         <section className="panel anchorPanel" id="marketplace"><h3>✦ AI Marketplace</h3><p>Explore the GBK AI “Ask for Anything” marketplace for products, services and everyday needs.</p><a href="https://market.gbkai.com" target="_blank" rel="noreferrer">Open Marketplace ↗</a></section>
