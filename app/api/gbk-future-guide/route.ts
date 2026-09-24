@@ -95,7 +95,7 @@ const pages = [
       "",
       "Examples:",
       "Find an AC repair near me",
-      "Book a hotel in Hyderabad",
+      "Book a hotel in Pattaya",
       "Find flights to Dubai",
       "Find a restaurant nearby",
       "I need a website",
@@ -393,7 +393,7 @@ export async function GET() {
   return new Response(Buffer.from(pdf, "latin1"), {
     headers: {
       "Content-Type": "application/pdf",
-      "Content-Disposition": 'attachment; filename="GBK-Future-Ecosystem-Guide.pdf"',
+      "Content-Disposition": 'attachment; filename="GBK-Future-Ecosystem-Guide-Pattaya.pdf"',
       "Cache-Control": "public, max-age=3600"
     }
   });
