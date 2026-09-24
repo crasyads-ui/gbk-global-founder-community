@@ -66,6 +66,8 @@ export default function Home() {
   const [membershipKey] = useState<keyof typeof membershipTiers | null>(null);
   const [referralCode, setReferralCode] = useState("");
   const [selectedTier, setSelectedTier] = useState<keyof typeof membershipTiers | null>(null);
+  const [txHash, setTxHash] = useState("");
+  const [verificationStatus, setVerificationStatus] = useState("Not submitted");
   const walletConnectProviderRef = useRef<any>(null);
 
   type EthereumProvider = {
@@ -335,11 +337,11 @@ export default function Home() {
           </div>
           <div className="confirmationFields">
             <div><span>Swap status</span><b>Confirmed</b></div>
-            <div><span>Transaction hash</span><b>Available after confirmation</b></div>
+            <div><span>Transaction hash</span><b>{txHash ? `${txHash.slice(0, 10)}…${txHash.slice(-8)}` : "Not submitted"}</b></div>
             <div><span>GBK amount</span><b>Read from confirmed transaction</b></div>
             <div><span>Wallet</span><b>Connected Founder wallet</b></div>
           </div>
-          <div className="notice"><b>Founder tracking:</b> A successful on-chain swap can be used for eligible activity/referral tracking. A button click or swap attempt is not treated as a confirmed transaction. Final eligibility depends on the published program rules.</div>
+          <div className="notice"><b>Verification:</b> The dashboard now distinguishes wallet connection, transaction submission and verification. Final Founder activation must come from the secure backend after the transaction, sender, amount and membership payment destination/rules are verified.</div>
         </section>
 
         <section className="panel membershipStatusPanel" id="membership-status">
@@ -402,7 +404,7 @@ export default function Home() {
             </div>
             <div className="quickBuyAction">
               <b>{!wallet ? "Connect wallet to continue" : selectedTier ? `Selected: ${membershipTiers[selectedTier].title} · ${membershipTiers[selectedTier].amount}` : "Choose a membership level"}</b>
-              <button className="primary" type="button" disabled={!wallet || !selectedTier}>Continue to Payment →</button>
+              <button className="primary" type="button" disabled={!wallet || !selectedTier} onClick={() => { if (selectedTier) { setVerificationStatus("Payment route ready"); document.getElementById("swap-confirmation")?.scrollIntoView({ behavior: "smooth" }); } }}>Continue to Payment →</button>
             </div>
           </div>
           <div className="coreGrid">
@@ -411,7 +413,7 @@ export default function Home() {
             <div className="coreCard"><b>3. Membership</b><small>Country Founder: $300 / $500 / $1,000 · Global Founder: $3,000 / $5,000 / $10,000.</small><a href="#programs">View Programs →</a></div>
             <div className="coreCard"><b>4. Verification</b><small>Membership and founder status must be verified before badges or restricted benefits are activated.</small><span className="statusPill">VERIFICATION READY</span></div>
           </div>
-          <div className="notice">Wallet connection supports injected BNB wallets and WalletConnect for normal mobile/desktop browsers. A production membership/profile system still requires secure backend authentication and database verification; a connected wallet is not proof of membership.</div>
+          <div className="notice">Wallet connection supports injected BNB wallets and WalletConnect for normal mobile/desktop browsers. Membership verification is not automatic from wallet connection. A submitted transaction must be checked against the published membership payment rules before Founder status is activated.</div>
         </section>
 
         <section className="panel founderHub" id="founder-hub"><div className="panelHead"><div><h3>🚀 Founder Workspace</h3><p>Share GBK content, invite genuine community members and track your campaign activity.</p></div><span className="badge">FOUNDER TOOLS</span></div><div className="hubGrid"><div className="hubCard"><b>🔗 Your GBK Share Link</b><small>Use the official ecosystem entry point when sharing. Copy it once, then post through your own social accounts.</small><button className="hubBtn" onClick={() => navigator.clipboard?.writeText("https://app.gbkai.com")}>Copy GBK Link</button></div><div className="hubCard"><b>📣 Social Share</b><small>Share the GBK ecosystem through supported social platforms. Review content before posting.</small><div className="shareRow"><a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fapp.gbkai.com" target="_blank" rel="noreferrer">Facebook</a><a href="https://twitter.com/intent/tweet?url=https%3A%2F%2Fapp.gbkai.com&text=Explore%20the%20GBK%20ecosystem" target="_blank" rel="noreferrer">X</a><a href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fapp.gbkai.com" target="_blank" rel="noreferrer">LinkedIn</a><a href="https://wa.me/?text=Explore%20the%20GBK%20ecosystem%20https%3A%2F%2Fapp.gbkai.com" target="_blank" rel="noreferrer">WhatsApp</a></div></div><div className="hubCard"><b>🎬 Short Video Hub</b><small>Ready-to-share topics: What is GBK? · How GBK Swap works · Buy & Hold · AI Marketplace · Learn · Agri.</small><Link className="hubBtn" href="/tools">Open Content Studio →</Link></div><div className="hubCard"><b>📊 Founder Analytics</b><small>Track content reach, website visits, wallet connections, successful swaps and returning users once live analytics is connected.</small><Link className="hubBtn" href="/tools">Open Analytics →</Link></div></div></section>
