@@ -340,6 +340,7 @@ export default function Home() {
             <div className="heroBtns"><a className="secondary" href="#install">📲 Add to Home Screen</a>
               <a className="primary" href="https://app.gbkai.com" target="_blank" rel="noreferrer">↔ Swap GBK Easily ↗</a>
               <a className="secondary" href="#benefits">View Founder Benefits</a>
+              <a className="secondary" href="/api/gbk-future-guide">📄 Download 10-Page GBK Guide</a>
             </div>
           </div>
           <div className="heroOrb"><div className="orb">GBK</div><span>GLOBAL<br/>NETWORK</span></div>
@@ -386,6 +387,10 @@ export default function Home() {
             <span>HOLDERS</span><i>→</i><span>USERS</span><i>→</i><span>FOUNDERS</span><i>→</i><span>MERCHANTS</span><i>→</i><span>MARKETPLACE</span><i>→</i><span>GLOBAL COMMUNITY</span>
           </div>
           <div className="notice"><b>Clear separation:</b> Token-holder rewards, Founder membership, referral rewards and marketplace participation are separate program components. Each follows its own current rules and conditions.</div>
+          <div className="ecosystemDownload">
+            <div><b>📘 GBK Future Ecosystem Guide</b><small>10-page overview covering the GBK vision, token holder journey, official contract, Swap, AI Marketplace, Founder program, Learn, Agri, community strategy and roadmap.</small></div>
+            <a className="primary" href="/api/gbk-future-guide">Download PDF ↗</a>
+          </div>
         </section>
 
         <div className="grid2">
