@@ -71,6 +71,7 @@ export default function Home() {
   const [txHash, setTxHash] = useState("");
   const [verificationStatus, setVerificationStatus] = useState("Not submitted");
   const [membershipLoading, setMembershipLoading] = useState(false);
+  const [referralCopied, setReferralCopied] = useState(false);
   const walletConnectProviderRef = useRef<any>(null);
 
   type EthereumProvider = {
@@ -301,6 +302,18 @@ export default function Home() {
   }
 
   const shortWallet = wallet ? `${wallet.slice(0, 6)}…${wallet.slice(-4)}` : "";
+  const referralLink = wallet ? `https://app.gbkai.com/?ref=${wallet}` : "";
+
+  async function copyReferralLink() {
+    if (!referralLink) return;
+    try {
+      await navigator.clipboard.writeText(referralLink);
+      setReferralCopied(true);
+      window.setTimeout(() => setReferralCopied(false), 1800);
+    } catch {
+      setReferralCopied(false);
+    }
+  }
 
   return (
     <main className="shell">
@@ -442,20 +455,29 @@ export default function Home() {
           <div className="walletStatus">{walletStatus}</div>
           {!wallet && <div className="walletHint">🔐 Secure mobile connection: normal browsers can use WalletConnect to open a supported wallet.</div>}
           {wallet && (
-            <div className="earnReferralBox">
-              <div>
-                <span className="earnBadge">WALLET CONNECTED</span>
-                <b>💰 L1 / L2 Earn & Referral</b>
-                <small>Use the same connected wallet on app.gbkai.com to open the GBK Earn & Referral area and access your eligible GBK referral activity.</small>
-                <div className="earnLevels"><span><strong>L1</strong> 6%</span><span><strong>L2</strong> 2%</span></div>
+            <>
+              <div className="earnReferralBox">
+                <div>
+                  <span className="earnBadge">WALLET CONNECTED</span>
+                  <b>💰 L1 / L2 Earn & Referral</b>
+                  <small>Use the same connected wallet on app.gbkai.com to open the GBK Earn & Referral area and access your referral activity.</small>
+                  <div className="earnLevels"><span><strong>L1</strong> 6%</span><span><strong>L2</strong> 2%</span></div>
+                </div>
+                <div className="earnActions">
+                  <a className="primary" href={EARN_URL} target="_blank" rel="noreferrer">Open Earn & Referral ↗</a>
+                  <a className="hubBtn" href="https://pancakeswap.finance" target="_blank" rel="noreferrer">PancakeSwap ↗</a>
+                </div>
               </div>
-              <div className="earnActions">
-                <a className="primary" href={EARN_URL} target="_blank" rel="noreferrer">Open Earn & Referral ↗</a>
-                <a className="hubBtn" href="https://pancakeswap.finance" target="_blank" rel="noreferrer">PancakeSwap ↗</a>
+              <div className="founderReferralLinkBox">
+                <div className="founderReferralTitle">👥 Your referral link</div>
+                <div className="founderReferralUrl">{referralLink}</div>
+                <button className="primary founderCopyReferral" type="button" onClick={copyReferralLink}>
+                  {referralCopied ? "✓ COPIED" : "COPY REFERRAL LINK"}
+                </button>
               </div>
-            </div>
+            </>
           )}
-          <div className="simpleFounderFlow">
+
             <div className="simpleStep"><span>1</span><b>Connect Wallet</b><small>Connect your BNB Smart Chain wallet.</small></div>
             <div className="simpleArrow">→</div>
             <div className="simpleStep"><span>2</span><b>Choose Membership</b><small>Select your Country or Global Founder level.</small></div>
