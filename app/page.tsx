@@ -347,6 +347,47 @@ export default function Home() {
 
         <div className="stats">{stats.map(([a,b,c])=><div className="stat" key={a}><span>{a}</span><strong>{b}</strong><small>{c}</small></div>)}</div>
 
+        <section className="ecosystemLanding" id="ecosystem">
+          <div className="ecosystemLandingHead">
+            <div>
+              <div className="pill">● FOR EVERYONE</div>
+              <h2>🌍 GBK Community Ecosystem</h2>
+              <p>One simple path for token holders, users, founders and businesses: <b>Hold → Use → Build → Connect → Grow.</b></p>
+            </div>
+            <div className="ecosystemTag">GLOBAL ECOSYSTEM</div>
+          </div>
+          <div className="ecosystemCards">
+            <a className="ecoCard ecoToken" href="#daily-rewards">
+              <span className="ecoIcon">🪙</span><div><b>HOLD GBK</b><small>Token holders can explore the applicable GBK token-reward mechanism and ecosystem utilities.</small></div><strong>Explore →</strong>
+            </a>
+            <a className="ecoCard ecoSwap" href="https://app.gbkai.com" target="_blank" rel="noreferrer">
+              <span className="ecoIcon">🔄</span><div><b>USE GBK</b><small>Open the supported GBK swap and ecosystem application.</small></div><strong>Open →</strong>
+            </a>
+            <a className="ecoCard ecoFounder" href="#global-founder">
+              <span className="ecoIcon">👑</span><div><b>BUILD WITH GBK</b><small>Country and Global Founder participation for community and ecosystem development.</small></div><strong>Explore →</strong>
+            </a>
+            <a className="ecoCard ecoMerchant" href="#merchants">
+              <span className="ecoIcon">🏪</span><div><b>CONNECT BUSINESSES</b><small>Help genuine merchants and service providers enter the GBK network.</small></div><strong>Connect →</strong>
+            </a>
+            <a className="ecoCard ecoMarket" href="https://market.gbkai.com" target="_blank" rel="noreferrer">
+              <span className="ecoIcon">🤖</span><div><b>AI MARKETPLACE</b><small>Ask for products, services and everyday needs through the marketplace vision.</small></div><strong>Ask AI →</strong>
+            </a>
+            <a className="ecoCard ecoLearn" href="https://learn.gbkai.com" target="_blank" rel="noreferrer">
+              <span className="ecoIcon">📚</span><div><b>LEARN</b><small>Multilingual learning, spoken English and digital skills.</small></div><strong>Learn →</strong>
+            </a>
+            <a className="ecoCard ecoAgri" href="https://agri.gbkai.com" target="_blank" rel="noreferrer">
+              <span className="ecoIcon">🌾</span><div><b>AI AGRI</b><small>Explore agricultural AI tools and information services.</small></div><strong>Explore →</strong>
+            </a>
+            <a className="ecoCard ecoCommunity" href="#founder-hub">
+              <span className="ecoIcon">🌎</span><div><b>JOIN THE NETWORK</b><small>Participate in content, events, merchant initiatives and community activities.</small></div><strong>Join →</strong>
+            </a>
+          </div>
+          <div className="ecosystemFlow">
+            <span>HOLDERS</span><i>→</i><span>USERS</span><i>→</i><span>FOUNDERS</span><i>→</i><span>MERCHANTS</span><i>→</i><span>MARKETPLACE</span><i>→</i><span>GLOBAL COMMUNITY</span>
+          </div>
+          <div className="notice"><b>Clear separation:</b> Token-holder rewards, Founder membership, referral rewards and marketplace participation are separate program components. Each follows its own current rules and conditions.</div>
+        </section>
+
         <div className="grid2">
           <section className="panel funnel"><div className="panelHead"><div><h3>Community Growth Funnel</h3><p>Illustrative campaign metrics.</p></div><button className="mini">90 Days ▾</button></div>
             {[["Content reach","100K","100%"],["Website visits","10K","72%"],["Wallet connections","500","44%"],["Successful swaps","200+","31%"],["Returning users","128","21%"]].map(([a,b,w])=><div className="frow" key={a}><div><span>{a}</span><b>{b}</b></div><div className="bar"><i style={{width:w}}/></div></div>)}
