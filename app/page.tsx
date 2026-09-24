@@ -64,6 +64,8 @@ export default function Home() {
   const [walletStatus, setWalletStatus] = useState("Not connected");
   const [profileSaved, setProfileSaved] = useState(false);
   const [membershipKey] = useState<keyof typeof membershipTiers | null>(null);
+  const [referralCode, setReferralCode] = useState("");
+  const [selectedTier, setSelectedTier] = useState<keyof typeof membershipTiers | null>(null);
   const walletConnectProviderRef = useRef<any>(null);
 
   type EthereumProvider = {
@@ -378,6 +380,31 @@ export default function Home() {
               </div>
             </div>
           )}
+          <div className="simpleFounderFlow">
+            <div className="simpleStep"><span>1</span><b>Connect Wallet</b><small>Connect your BNB Smart Chain wallet.</small></div>
+            <div className="simpleArrow">→</div>
+            <div className="simpleStep"><span>2</span><b>Choose Membership</b><small>Select your Country or Global Founder level.</small></div>
+            <div className="simpleArrow">→</div>
+            <div className="simpleStep"><span>3</span><b>Pay & Verify</b><small>Confirm the transaction. Verification happens in the background.</small></div>
+          </div>
+          <div className="membershipQuickBuy">
+            <div className="quickBuyHead"><div><b>⚡ Simple Founder Membership</b><small>Referral code is optional. Wallet connection is required before payment.</small></div><span className="badge">SIMPLE FLOW</span></div>
+            <div className="referralInputRow">
+              <input value={referralCode} onChange={(e) => setReferralCode(e.target.value)} placeholder="Referral code (optional)" aria-label="Referral code optional" />
+              <span>{referralCode ? "Referral recorded for onboarding" : "No referral code? Continue without it."}</span>
+            </div>
+            <div className="tierButtons">
+              {(Object.entries(membershipTiers) as [keyof typeof membershipTiers, typeof membershipTiers[keyof typeof membershipTiers]][]).map(([key,tier]) => (
+                <button key={key} type="button" className={selectedTier === key ? "tierButton selected" : "tierButton"} onClick={() => setSelectedTier(key)} disabled={!wallet}>
+                  <b>{tier.title}</b><span>{tier.amount}</span>
+                </button>
+              ))}
+            </div>
+            <div className="quickBuyAction">
+              <b>{!wallet ? "Connect wallet to continue" : selectedTier ? `Selected: ${membershipTiers[selectedTier].title} · ${membershipTiers[selectedTier].amount}` : "Choose a membership level"}</b>
+              <button className="primary" type="button" disabled={!wallet || !selectedTier}>Continue to Payment →</button>
+            </div>
+          </div>
           <div className="coreGrid">
             <div className="coreCard"><b>1. Connect / Sign In</b><small>Connect your supported wallet to identify your Founder dashboard session.</small><button className="hubBtn" type="button" onClick={connectWallet}>{wallet ? "Wallet Connected ✓" : "Connect Wallet"}</button></div>
             <div className="coreCard"><b>2. Complete Profile</b><small>Name, country, city, preferred language, social links and founder focus.</small><button className="hubBtn" type="button" onClick={() => setProfileSaved(true)}>{profileSaved ? "Profile Saved ✓" : "Profile Setup"}</button></div>
