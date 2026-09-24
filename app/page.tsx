@@ -243,14 +243,12 @@ export default function Home() {
     window.localStorage.removeItem("gbkFounderWallet");
   }
 
-  const SUPABASE_URL = "https://yjwgnapymqetxvksqacd.supabase.co";
-  const SUPABASE_KEY = "sb_publishable_Y3n5bVO3xveBnyt4LKbCPg_f5ilMSuz";
-
   async function founderApi(body: Record<string, unknown>) {
-    const res = await fetch(`${SUPABASE_URL}/functions/v1/gbk-founder-membership`, {
+    const res = await fetch("/api/founder", {
       method: "POST",
-      headers: { "Content-Type": "application/json", apikey: SUPABASE_KEY },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
+      cache: "no-store",
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok || data?.ok === false) throw new Error(data?.error || "Founder verification request failed");
