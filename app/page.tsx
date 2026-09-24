@@ -72,8 +72,8 @@ export default function Home() {
             <div className="pill">● COMMUNITY PLATFORM</div>
             <h2>GBK: Blockchain + AI +<br/><em>Real-World Utility</em></h2>
             <p>Connect founders, merchants, builders and communities across countries while exploring the GBK ecosystem.</p>
-            <div className="heroBtns">
-              <a className="primary" href="https://app.gbkai.com" target="_blank" rel="noreferrer">Explore GBK Swap ↗</a>
+            <div className="heroBtns"><a className="secondary" href="#install">📲 Add to Home Screen</a>
+              <a className="primary" href="https://app.gbkai.com" target="_blank" rel="noreferrer">↔ Swap GBK Easily ↗</a>
               <a className="secondary" href="#benefits">View Founder Benefits</a>
             </div>
           </div>
@@ -96,6 +96,8 @@ export default function Home() {
         </div>
 
         <section className="panel benefitsPanel" id="benefits"><div className="panelHead"><div><h3>🌐 Global Founder Community Benefits</h3><p>Designed for international networking, collaboration and active ecosystem participation.</p></div><span className="badge">GLOBAL FOUNDER</span></div><div className="benefitGrid">{benefits.map((b,i)=><div className="benefit" key={b}><span>{["◈","◎","◉","✦","♧","◇","↗","★"][i]}</span><div><b>{b}</b><small>Subject to eligibility, availability and published program terms.</small></div></div>)}</div><div className="notice">Global Founder membership is a community/ecosystem participation program. It does not promise token price appreciation, profits or guaranteed business results.</div></section>
+
+        <section className="panel installPanel" id="install"><div className="panelHead"><div><h3>📲 Install GBK Founder</h3><p>Add this website to your phone home screen for quick access.</p></div><span className="badge">PWA</span></div><div className="installGrid"><div><b>Android</b><small>Open the site in Chrome → browser menu → Add to Home screen.</small></div><div><b>iPhone</b><small>Open in Safari → Share → Add to Home Screen.</small></div></div></section>
 
         <section className="panel rebasePanel" id="rebase">
           <div className="panelHead"><div><h3>🔄 GBK Buy & Hold · Automatic Token Increase</h3><p>Hold eligible GBK and receive additional GBK tokens through the rebase mechanism.</p></div><span className="badge">~3%–27% / MONTH</span></div>
