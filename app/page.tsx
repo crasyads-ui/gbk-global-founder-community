@@ -63,11 +63,12 @@ export default function Home() {
   const [wallet, setWallet] = useState("");
   const [walletStatus, setWalletStatus] = useState("Not connected");
   const [profileSaved, setProfileSaved] = useState(false);
-  const [membershipKey] = useState<keyof typeof membershipTiers | null>(null);
+  const [membershipRecord, setMembershipRecord] = useState<any>(null);
   const [referralCode, setReferralCode] = useState("");
   const [selectedTier, setSelectedTier] = useState<keyof typeof membershipTiers | null>(null);
   const [txHash, setTxHash] = useState("");
   const [verificationStatus, setVerificationStatus] = useState("Not submitted");
+  const [membershipLoading, setMembershipLoading] = useState(false);
   const walletConnectProviderRef = useRef<any>(null);
 
   type EthereumProvider = {
@@ -112,6 +113,10 @@ export default function Home() {
       ethereum.removeListener?.("chainChanged", handleChainChanged);
     };
   }, []);
+
+  useEffect(() => {
+    if (wallet) void refreshMembershipStatus(wallet);
+  }, [wallet]);
 
   async function ensureBscNetwork(provider: EthereumProvider) {
     try {
@@ -233,6 +238,66 @@ export default function Home() {
     window.localStorage.removeItem("gbkFounderWallet");
   }
 
+  const SUPABASE_URL = "https://yjwgnapymqetxvksqacd.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_Y3n5bVO3xveBnyt4LKbCPg_f5ilMSuz";
+
+  async function founderApi(body: Record<string, unknown>) {
+    const res = await fetch(`${SUPABASE_URL}/functions/v1/gbk-founder-membership`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", apikey: SUPABASE_KEY },
+      body: JSON.stringify(body),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || data?.ok === false) throw new Error(data?.error || "Founder verification request failed");
+    return data;
+  }
+
+  async function refreshMembershipStatus(address = wallet) {
+    if (!address) return;
+    setMembershipLoading(true);
+    try {
+      const data = await founderApi({ action: "status", wallet: address });
+      setMembershipRecord(data.memberships?.[0] || null);
+    } catch (error) {
+      setVerificationStatus(error instanceof Error ? error.message : "Membership status unavailable");
+    } finally {
+      setMembershipLoading(false);
+    }
+  }
+
+  async function verifyFounderTransaction() {
+    if (!wallet) {
+      setVerificationStatus("Connect your wallet first.");
+      return;
+    }
+    if (!selectedTier) {
+      setVerificationStatus("Choose a Founder membership level first.");
+      return;
+    }
+    if (!/^0x[0-9a-fA-F]{64}$/.test(txHash.trim())) {
+      setVerificationStatus("Enter a valid BSC transaction hash.");
+      return;
+    }
+    setVerificationStatus("Checking BSC transaction…");
+    try {
+      const data = await founderApi({
+        action: "verify-tx",
+        wallet,
+        tier: selectedTier,
+        txHash: txHash.trim(),
+        referralCode: referralCode.trim() || null,
+      });
+      if (data.membership) {
+        setMembershipRecord(data.membership);
+        setVerificationStatus("Founder membership verified ✓");
+      } else {
+        setVerificationStatus(data.message || "Transaction does not qualify yet.");
+      }
+    } catch (error) {
+      setVerificationStatus(error instanceof Error ? error.message : "Verification failed");
+    }
+  }
+
   const shortWallet = wallet ? `${wallet.slice(0, 6)}…${wallet.slice(-4)}` : "";
 
   return (
@@ -323,41 +388,47 @@ export default function Home() {
         </section>
 
         <section className="panel swapConfirmationPanel" id="swap-confirmation">
-          <div className="panelHead"><div><h3>🔄 GBK Swap Confirmation</h3><p>Record eligible swap activity only after the blockchain transaction is confirmed.</p></div><span className="badge">ON-CHAIN CONFIRMATION</span></div>
+          <div className="panelHead"><div><h3>🔄 Founder Membership On-Chain Verification</h3><p>Complete the selected membership amount through GBK Swap, then submit the BSC transaction hash.</p></div><span className="badge">LIVE VERIFICATION</span></div>
           <div className="swapFlow">
-            <div className="swapStep"><span>1</span><b>Connect Wallet</b><small>Connect your supported BNB Smart Chain wallet.</small></div>
+            <div className="swapStep"><span>1</span><b>Connect Wallet</b><small>Use the same BNB Smart Chain wallet for the membership purchase.</small></div>
             <div className="swapArrow">→</div>
-            <div className="swapStep"><span>2</span><b>Open GBK Swap</b><small>Complete your GBK swap through the supported swap route.</small></div>
+            <div className="swapStep"><span>2</span><b>Complete Selected Amount</b><small>Spend at least the selected USD tier in USDT and receive GBK in the same wallet.</small></div>
             <div className="swapArrow">→</div>
-            <div className="swapStep"><span>3</span><b>Confirm Transaction</b><small>Wait for the blockchain transaction to be confirmed.</small></div>
+            <div className="swapStep"><span>3</span><b>Verify</b><small>Backend checks the confirmed BSC transaction, sender, USDT spent and GBK received.</small></div>
           </div>
           <div className="confirmationCard">
-            <div><b>Transaction status</b><strong>✓ Confirmed on BNB Smart Chain</strong><small>Eligible activity can be recorded only after successful on-chain confirmation.</small></div>
+            <div><b>Selected membership</b><strong>{selectedTier ? `${membershipTiers[selectedTier].title} · ${membershipTiers[selectedTier].amount}` : "Choose a membership level above"}</strong><small>Membership verification uses the selected USD threshold; no private key or seed phrase is requested.</small></div>
             <a className="primary" href="https://app.gbkai.com" target="_blank" rel="noreferrer">Open GBK Swap ↗</a>
           </div>
           <div className="confirmationFields">
-            <div><span>Swap status</span><b>Confirmed</b></div>
+            <div><span>Verification status</span><b>{verificationStatus}</b></div>
             <div><span>Transaction hash</span><b>{txHash ? `${txHash.slice(0, 10)}…${txHash.slice(-8)}` : "Not submitted"}</b></div>
-            <div><span>GBK amount</span><b>Read from confirmed transaction</b></div>
-            <div><span>Wallet</span><b>Connected Founder wallet</b></div>
+            <div><span>Wallet</span><b>{wallet ? shortWallet : "Connect wallet first"}</b></div>
+            <div><span>Holding rule</span><b>Keep ≥ 50% of activation GBK baseline</b></div>
           </div>
-          <div className="notice"><b>Verification:</b> The dashboard now distinguishes wallet connection, transaction submission and verification. Final Founder activation must come from the secure backend after the transaction, sender, amount and membership payment destination/rules are verified.</div>
+          <div className="confirmationInputRow">
+            <input value={txHash} onChange={(e) => setTxHash(e.target.value.trim())} placeholder="0x… BSC transaction hash" aria-label="BSC transaction hash" />
+            <button className="primary" type="button" disabled={!wallet || !selectedTier || !txHash} onClick={verifyFounderTransaction}>Verify Transaction</button>
+          </div>
+          <div className="notice"><b>Automatic checks:</b> successful BSC receipt → connected wallet is the transaction sender → selected USDT threshold is met → GBK is received by the same wallet → activation GBK balance is recorded → Founder status is activated. The dashboard then checks the 50% holding rule.</div>
         </section>
 
         <section className="panel membershipStatusPanel" id="membership-status">
           <div className="panelHead">
-            <div><h3>🏅 Founder Membership Status</h3><p>Your verified membership scope, amount, badge and benefits.</p></div>
-            <span className={`statusPill ${membershipKey ? "connected" : ""}`}>{membershipKey ? "MEMBERSHIP CONFIRMED" : "AWAITING VERIFICATION"}</span>
+            <div><h3>🏅 Founder Membership Status</h3><p>Live status from the Founder verification backend.</p></div>
+            <span className={`statusPill ${membershipRecord?.status === "active" ? "connected" : ""}`}>{membershipLoading ? "CHECKING…" : membershipRecord?.status === "active" ? "MEMBERSHIP ACTIVE" : "AWAITING VERIFICATION"}</span>
           </div>
-          {membershipKey ? (() => {
-            const tier = membershipTiers[membershipKey];
+          {membershipRecord ? (() => {
+            const tier = membershipTiers[membershipRecord.tier_code as keyof typeof membershipTiers];
+            const holdingActive = membershipRecord.holding_status === "active";
             return <div className="membershipDashboard">
-              <div className="membershipIdentity"><span className="membershipBadge">🏅 {tier.badge}</span><strong>{tier.title}</strong><small>{tier.scope} Founder · {tier.amount}</small></div>
-              <div className="membershipMeta"><div><span>Scope</span><b>{tier.scope} Wise</b></div><div><span>Confirmed Amount</span><b>{tier.amount}</b></div><div><span>Badge</span><b>{tier.badge}</b></div><div><span>Status</span><b>Confirmed ✓</b></div></div>
-              <div className="membershipBenefits"><b>Unlocked benefits</b>{tier.benefits.map(x=><span key={x}>✓ {x}</span>)}</div>
+              <div className="membershipIdentity"><span className="membershipBadge">🏅 {tier?.badge || "FOUNDER"}</span><strong>{tier?.title || membershipRecord.tier_code}</strong><small>{tier?.scope || "Founder"} · ${membershipRecord.price_usd}</small></div>
+              <div className="membershipMeta"><div><span>Scope</span><b>{tier?.scope || "Founder"}</b></div><div><span>Verified Amount</span><b>${membershipRecord.price_usd}</b></div><div><span>GBK Baseline</span><b>{Number(membershipRecord.baseline_gbk_balance).toLocaleString()} GBK</b></div><div><span>Minimum Holding</span><b>{Number(membershipRecord.minimum_gbk_balance).toLocaleString()} GBK</b></div></div>
+              <div className="membershipBenefits"><b>{holdingActive ? "Founder benefits active ✓" : "Founder benefits paused"}</b><span>Current GBK: {Number(membershipRecord.current_gbk_balance).toLocaleString()} GBK</span><span>Required: at least 50% of activation baseline</span>{(tier?.benefits || []).map(x=><span key={x}>{holdingActive ? "✓" : "⏸"} {x}</span>)}</div>
+              <div className="notice"><b>50% holding rule:</b> activation baseline = {Number(membershipRecord.baseline_gbk_balance).toLocaleString()} GBK; minimum = {Number(membershipRecord.minimum_gbk_balance).toLocaleString()} GBK. Below the minimum, Founder benefits are paused; returning to the minimum reactivates them.</div>
             </div>;
-          })() : <div className="membershipPending"><strong>Connect wallet → membership verification → automatic dashboard badge</strong><span>After an approved membership record is verified, this panel is designed to show Country/Global scope, confirmed amount, matching badge and the benefits assigned to that tier.</span><div className="tierPreview">{Object.values(membershipTiers).map(t=><div key={t.amount+t.title}><b>{t.title}</b><small>{t.scope} · {t.amount}</small></div>)}</div></div>}
-          <div className="notice"><b>Verification rule:</b> A connected wallet alone does not confirm membership. Badge and benefits should activate only from a verified membership record.</div>
+          })() : <div className="membershipPending"><strong>Connect wallet → choose membership → complete qualifying GBK purchase → verify transaction</strong><span>The backend verifies the BSC transaction and records the original GBK balance at activation. Referral code is optional.</span><div className="tierPreview">{Object.values(membershipTiers).map(t=><div key={t.amount+t.title}><b>{t.title}</b><small>{t.scope} · {t.amount}</small></div>)}</div></div>}
+          <div className="notice"><b>Security:</b> Never enter a seed phrase or private key. Only the public wallet address and confirmed BSC transaction hash are used for verification.</div>
         </section>
 
         <section className="panel founderCore" id="founder-core">
@@ -404,7 +475,7 @@ export default function Home() {
             </div>
             <div className="quickBuyAction">
               <b>{!wallet ? "Connect wallet to continue" : selectedTier ? `Selected: ${membershipTiers[selectedTier].title} · ${membershipTiers[selectedTier].amount}` : "Choose a membership level"}</b>
-              <button className="primary" type="button" disabled={!wallet || !selectedTier} onClick={() => { if (selectedTier) { setVerificationStatus("Payment route ready"); document.getElementById("swap-confirmation")?.scrollIntoView({ behavior: "smooth" }); } }}>Continue to Payment →</button>
+              <button className="primary" type="button" disabled={!wallet || !selectedTier} onClick={() => { if (selectedTier) { setVerificationStatus("Payment route ready — complete the selected amount in GBK Swap."); window.open("https://app.gbkai.com", "_blank", "noopener,noreferrer"); document.getElementById("swap-confirmation")?.scrollIntoView({ behavior: "smooth" }); } }}>Continue to Payment →</button>
             </div>
           </div>
           <div className="coreGrid">
