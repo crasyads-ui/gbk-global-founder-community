@@ -62,32 +62,72 @@ function NavItem({ item }: { item: string[] }) {
 export default function Home() {
   const [wallet, setWallet] = useState("");
   const [walletStatus, setWalletStatus] = useState("Not connected");
-  const [profileSaved, setProfileSaved] = useState(false);\n  const [membershipKey] = useState<keyof typeof membershipTiers | null>(null);
+  const [profileSaved, setProfileSaved] = useState(false);
+  const [membershipKey] = useState<keyof typeof membershipTiers | null>(null);
+
+  type EthereumProvider = {
+    request: (args: { method: string; params?: unknown[] }) => Promise<unknown>;
+    on?: (event: string, handler: (...args: unknown[]) => void) => void;
+    removeListener?: (event: string, handler: (...args: unknown[]) => void) => void;
+  };
 
   useEffect(() => {
+    const ethereum = (window as Window & { ethereum?: EthereumProvider }).ethereum;
     const saved = window.localStorage.getItem("gbkFounderWallet");
     if (saved) {
       setWallet(saved);
       setWalletStatus("Connected");
     }
+
+    if (!ethereum?.on) return;
+
+    const handleAccountsChanged = (...args: unknown[]) => {
+      const accounts = Array.isArray(args[0]) ? args[0] as string[] : [];
+      const address = accounts[0];
+      if (address) {
+        setWallet(address);
+        window.localStorage.setItem("gbkFounderWallet", address);
+        setWalletStatus("Connected");
+      } else {
+        setWallet("");
+        setWalletStatus("Not connected");
+        window.localStorage.removeItem("gbkFounderWallet");
+      }
+    };
+
+    const handleChainChanged = () => {
+      setWalletStatus("Connected · network changed");
+    };
+
+    ethereum.on("accountsChanged", handleAccountsChanged);
+    ethereum.on("chainChanged", handleChainChanged);
+
+    return () => {
+      ethereum.removeListener?.("accountsChanged", handleAccountsChanged);
+      ethereum.removeListener?.("chainChanged", handleChainChanged);
+    };
   }, []);
 
   async function connectWallet() {
-    const ethereum = (window as Window & { ethereum?: { request: (args: { method: string; params?: unknown[] }) => Promise<unknown> } }).ethereum;
+    const ethereum = (window as Window & { ethereum?: EthereumProvider }).ethereum;
     if (!ethereum) {
-      setWalletStatus("No compatible wallet found. Open in a BNB Smart Chain wallet browser or install a compatible wallet.");
+      setWalletStatus("No compatible wallet found. Open Founder in your BNB Smart Chain wallet browser or use a compatible wallet.");
       return;
     }
+
     try {
       setWalletStatus("Connecting…");
       const accounts = await ethereum.request({ method: "eth_requestAccounts" }) as string[];
       const address = accounts?.[0];
+
       if (!address) throw new Error("No wallet account returned");
+
       setWallet(address);
       window.localStorage.setItem("gbkFounderWallet", address);
       setWalletStatus("Connected");
     } catch (error) {
-      setWalletStatus(error instanceof Error ? error.message : "Wallet connection cancelled.");
+      const message = error instanceof Error ? error.message : "Wallet connection cancelled.";
+      setWalletStatus(message);
     }
   }
 
