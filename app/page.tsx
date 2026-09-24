@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 const nav = [
   ["Overview", "/", "⌂"],
@@ -50,6 +51,45 @@ function NavItem({ item }: { item: string[] }) {
 }
 
 export default function Home() {
+  const [wallet, setWallet] = useState("");
+  const [walletStatus, setWalletStatus] = useState("Not connected");
+  const [profileSaved, setProfileSaved] = useState(false);
+
+  useEffect(() => {
+    const saved = window.localStorage.getItem("gbkFounderWallet");
+    if (saved) {
+      setWallet(saved);
+      setWalletStatus("Connected");
+    }
+  }, []);
+
+  async function connectWallet() {
+    const ethereum = (window as Window & { ethereum?: { request: (args: { method: string; params?: unknown[] }) => Promise<unknown> } }).ethereum;
+    if (!ethereum) {
+      setWalletStatus("No compatible wallet found. Open in a BNB Smart Chain wallet browser or install a compatible wallet.");
+      return;
+    }
+    try {
+      setWalletStatus("Connecting…");
+      const accounts = await ethereum.request({ method: "eth_requestAccounts" }) as string[];
+      const address = accounts?.[0];
+      if (!address) throw new Error("No wallet account returned");
+      setWallet(address);
+      window.localStorage.setItem("gbkFounderWallet", address);
+      setWalletStatus("Connected");
+    } catch (error) {
+      setWalletStatus(error instanceof Error ? error.message : "Wallet connection cancelled.");
+    }
+  }
+
+  function disconnectWallet() {
+    setWallet("");
+    setWalletStatus("Not connected");
+    window.localStorage.removeItem("gbkFounderWallet");
+  }
+
+  const shortWallet = wallet ? `${wallet.slice(0, 6)}…${wallet.slice(-4)}` : "";
+
   return (
     <main className="shell">
       <aside className="sidebar">
@@ -137,7 +177,21 @@ export default function Home() {
           <div className="notice"><b>Clear separation:</b> Holding GBK does not automatically make someone a Global Community Founder. Founder membership is a community/ecosystem participation program and does not promise token price appreciation, profits or guaranteed business results.</div>
         </section>
 
-        <section className="panel founderCore" id="founder-core"><div className="panelHead"><div><h3>👤 Founder Core</h3><p>Start here to build your founder profile and participation record.</p></div><span className="badge">CORE</span></div><div className="coreGrid"><div className="coreCard"><b>1. Connect / Sign In</b><small>Connect your supported wallet or use the available sign-in flow.</small><a href="https://app.gbkai.com" target="_blank" rel="noreferrer">Open GBK App ↗</a></div><div className="coreCard"><b>2. Complete Profile</b><small>Name, country, city, preferred language, social links and founder focus.</small><button className="hubBtn" type="button">Profile Setup</button></div><div className="coreCard"><b>3. Membership</b><small>Country Founder: $300 / $500 / $1,000 · Global Founder: $3,000 / $5,000 / $10,000.</small><a href="#programs">View Programs →</a></div><div className="coreCard"><b>4. Verification</b><small>Membership and founder status should be verified before badges or restricted benefits are activated.</small><span className="statusPill">VERIFICATION READY</span></div></div><div className="notice">Membership is community/ecosystem participation. Prices, eligibility, verification and benefits should follow the published program terms.</div></section>
+        <section className="panel founderCore" id="founder-core">
+          <div className="panelHead"><div><h3>👤 Founder Core</h3><p>Connect your wallet and prepare your founder profile.</p></div><span className={`statusPill ${wallet ? "connected" : ""}`}>{wallet ? "WALLET CONNECTED" : "NOT CONNECTED"}</span></div>
+          <div className="walletConnectBox">
+            <div><b>{wallet ? `Connected: ${shortWallet}` : "Connect your BNB Smart Chain wallet"}</b><small>{wallet ? "Wallet address is saved on this device for the Founder dashboard." : "Use a compatible BNB Smart Chain wallet. Wallet connection does not by itself confirm Founder membership."}</small></div>
+            <div className="walletActions">{wallet ? <button className="hubBtn" type="button" onClick={disconnectWallet}>Disconnect</button> : <button className="primary" type="button" onClick={connectWallet}>🔗 Connect Wallet</button>}</div>
+          </div>
+          <div className="walletStatus">{walletStatus}</div>
+          <div className="coreGrid">
+            <div className="coreCard"><b>1. Connect / Sign In</b><small>Connect your supported wallet to identify your Founder dashboard session.</small><button className="hubBtn" type="button" onClick={connectWallet}>{wallet ? "Wallet Connected ✓" : "Connect Wallet"}</button></div>
+            <div className="coreCard"><b>2. Complete Profile</b><small>Name, country, city, preferred language, social links and founder focus.</small><button className="hubBtn" type="button" onClick={() => setProfileSaved(true)}>{profileSaved ? "Profile Saved ✓" : "Profile Setup"}</button></div>
+            <div className="coreCard"><b>3. Membership</b><small>Country Founder: $300 / $500 / $1,000 · Global Founder: $3,000 / $5,000 / $10,000.</small><a href="#programs">View Programs →</a></div>
+            <div className="coreCard"><b>4. Verification</b><small>Membership and founder status must be verified before badges or restricted benefits are activated.</small><span className="statusPill">VERIFICATION READY</span></div>
+          </div>
+          <div className="notice">Wallet connection is now enabled. A production membership/profile system still requires a secure backend authentication flow and database verification; the dashboard does not treat a connected wallet as proof of membership.</div>
+        </section>
 
         <section className="panel founderHub" id="founder-hub"><div className="panelHead"><div><h3>🚀 Founder Workspace</h3><p>Share GBK content, invite genuine community members and track your campaign activity.</p></div><span className="badge">FOUNDER TOOLS</span></div><div className="hubGrid"><div className="hubCard"><b>🔗 Your GBK Share Link</b><small>Use the official ecosystem entry point when sharing. Copy it once, then post through your own social accounts.</small><button className="hubBtn" onClick={() => navigator.clipboard?.writeText("https://app.gbkai.com")}>Copy GBK Link</button></div><div className="hubCard"><b>📣 Social Share</b><small>Share the GBK ecosystem through supported social platforms. Review content before posting.</small><div className="shareRow"><a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fapp.gbkai.com" target="_blank" rel="noreferrer">Facebook</a><a href="https://twitter.com/intent/tweet?url=https%3A%2F%2Fapp.gbkai.com&text=Explore%20the%20GBK%20ecosystem" target="_blank" rel="noreferrer">X</a><a href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fapp.gbkai.com" target="_blank" rel="noreferrer">LinkedIn</a><a href="https://wa.me/?text=Explore%20the%20GBK%20ecosystem%20https%3A%2F%2Fapp.gbkai.com" target="_blank" rel="noreferrer">WhatsApp</a></div></div><div className="hubCard"><b>🎬 Short Video Hub</b><small>Ready-to-share topics: What is GBK? · How GBK Swap works · Buy & Hold · AI Marketplace · Learn · Agri.</small><Link className="hubBtn" href="/tools">Open Content Studio →</Link></div><div className="hubCard"><b>📊 Founder Analytics</b><small>Track content reach, website visits, wallet connections, successful swaps and returning users once live analytics is connected.</small><Link className="hubBtn" href="/tools">Open Analytics →</Link></div></div></section>
 
