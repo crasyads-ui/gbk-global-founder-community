@@ -16,6 +16,7 @@ const nav = [
   ["Agri", "https://agri.gbkai.com", "♧"],
   ["Events", "/events", "◉"],
   ["Campaigns", "/tools", "◌"],
+  ["Downloads", "#downloads", "▣"],
 ];
 
 const stats = [
