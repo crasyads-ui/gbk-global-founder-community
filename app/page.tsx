@@ -477,7 +477,7 @@ export default function Home() {
               </div>
             </>
           )}
-
+          <div className="simpleFounderFlow">
             <div className="simpleStep"><span>1</span><b>Connect Wallet</b><small>Connect your BNB Smart Chain wallet.</small></div>
             <div className="simpleArrow">→</div>
             <div className="simpleStep"><span>2</span><b>Choose Membership</b><small>Select your Country or Global Founder level.</small></div>
