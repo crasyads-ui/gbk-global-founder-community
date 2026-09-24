@@ -206,6 +206,20 @@ export default function Home() {
             <div className="walletActions">{wallet ? <button className="hubBtn" type="button" onClick={disconnectWallet}>Disconnect</button> : <button className="primary" type="button" onClick={connectWallet}>🔗 Connect Wallet</button>}</div>
           </div>
           <div className="walletStatus">{walletStatus}</div>
+          {wallet && (
+            <div className="earnReferralBox">
+              <div>
+                <span className="earnBadge">WALLET CONNECTED</span>
+                <b>💰 L1 / L2 Earn & Referral</b>
+                <small>Use the same connected wallet on app.gbkai.com to open the GBK Earn & Referral area and access your eligible PancakeSwap referral activity.</small>
+                <div className="earnLevels"><span><strong>L1</strong> 6%</span><span><strong>L2</strong> 2%</span></div>
+              </div>
+              <div className="earnActions">
+                <a className="primary" href="https://app.gbkai.com" target="_blank" rel="noreferrer">Open Earn & Referral ↗</a>
+                <a className="hubBtn" href="https://pancakeswap.finance" target="_blank" rel="noreferrer">PancakeSwap ↗</a>
+              </div>
+            </div>
+          )}
           <div className="coreGrid">
             <div className="coreCard"><b>1. Connect / Sign In</b><small>Connect your supported wallet to identify your Founder dashboard session.</small><button className="hubBtn" type="button" onClick={connectWallet}>{wallet ? "Wallet Connected ✓" : "Connect Wallet"}</button></div>
             <div className="coreCard"><b>2. Complete Profile</b><small>Name, country, city, preferred language, social links and founder focus.</small><button className="hubBtn" type="button" onClick={() => setProfileSaved(true)}>{profileSaved ? "Profile Saved ✓" : "Profile Setup"}</button></div>
