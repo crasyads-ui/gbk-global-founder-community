@@ -97,6 +97,18 @@ export default function Home() {
 
         <section className="panel benefitsPanel" id="benefits"><div className="panelHead"><div><h3>🌐 Global Founder Community Benefits</h3><p>Designed for international networking, collaboration and active ecosystem participation.</p></div><span className="badge">GLOBAL FOUNDER</span></div><div className="benefitGrid">{benefits.map((b,i)=><div className="benefit" key={b}><span>{["◈","◎","◉","✦","♧","◇","↗","★"][i]}</span><div><b>{b}</b><small>Subject to eligibility, availability and published program terms.</small></div></div>)}</div><div className="notice">Global Founder membership is a community/ecosystem participation program. It does not promise token price appreciation, profits or guaranteed business results.</div></section>
 
+        <section className="panel rebasePanel" id="rebase">
+          <div className="panelHead"><div><h3>🔄 GBK Buy & Hold · Automatic Token Increase</h3><p>Hold eligible GBK and receive additional GBK tokens through the rebase mechanism.</p></div><span className="badge">~3%–27% / MONTH</span></div>
+          <div className="rebaseGrid">
+            <div className="rebaseCard"><span>1</span><b>Buy GBK</b><small>Acquire GBK through the supported swap route.</small></div>
+            <div className="rebaseCard"><span>2</span><b>Hold GBK</b><small>Keep eligible GBK in your supported BNB Smart Chain wallet.</small></div>
+            <div className="rebaseCard"><span>3</span><b>Automatic Rebase</b><small>The token balance can increase automatically according to applicable protocol rules and activity.</small></div>
+            <div className="rebaseCard"><span>4</span><b>More GBK Tokens</b><small>The bonus is additional GBK tokens, not a separate reward token.</small></div>
+          </div>
+          <div className="rebaseExample"><b>Illustrative example:</b> 100,000 GBK + 10% rebase = 110,000 GBK. The monthly percentage varies; approximately 3%–27% is the stated range. Token quantity and market value are separate. GBK price depends on market supply, demand and market capitalization.</div>
+          <div className="notice">The 3%–27% range is presented as a variable token-balance increase, not a guaranteed monetary return or guaranteed market-value increase. Actual results depend on the applicable GBK contract/protocol rules and activity.</div>
+        </section>
+
         <section className="panel referralPanel" id="referrals"><div className="panelHead"><div><h3>🔗 Referral Benefits · app.gbkai.com</h3><p>Referral program participation through the GBK ecosystem.</p></div><span className="badge">L1 + L2</span></div><div className="refGrid"><div className="refCard"><span>L1</span><strong>6%</strong><p>Direct referral reward</p><small>Eligible activity only</small></div><div className="refCard"><span>L2</span><strong>2%</strong><p>Second-level referral reward</p><small>Eligible activity only</small></div><div className="refFlow"><b>Connect Wallet</b><i>→</i><b>Get Referral Link</b><i>→</i><b>Invite Genuine Users</b><i>→</i><b>Eligible Swap</b><i>→</i><b>Reward Recorded</b></div></div><div className="notice">Referral rewards are subject to app.gbkai.com program rules, eligibility, completed qualifying transactions and applicable terms. No guaranteed income. No self-referrals, duplicate/fake accounts or spam.</div><div className="refActions"><a href="https://app.gbkai.com" target="_blank" rel="noreferrer">Open app.gbkai.com ↗</a><a href="https://app.gbkai.com" target="_blank" rel="noreferrer">Get Referral Link ↗</a></div></section>
 
         <section className="panel anchorPanel" id="merchants"><h3>🏪 Merchant Ecosystem</h3><p>Connect with participating merchants and explore GBK marketplace opportunities.</p></section>
