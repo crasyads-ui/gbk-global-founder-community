@@ -24,6 +24,15 @@ const stats = [
 ];
 
 const countries = [["🇮🇳","India","184"],["🇦🇪","UAE","96"],["🇺🇸","USA","74"],["🇧🇷","Brazil","61"],["🇻🇳","Vietnam","48"]];
+const membershipTiers = {
+  country_300: { scope: "Country", amount: "$300", badge: "COUNTRY FOUNDER", title: "Country Founder", benefits: ["Country founder networking","Local community participation","Approved founder marketing resources","Merchant and ecosystem connections"] },
+  country_500: { scope: "Country", amount: "$500", badge: "COUNTRY GROWTH FOUNDER", title: "Country Growth Founder", benefits: ["Country founder networking","Community growth participation","Approved founder marketing resources","Merchant and ecosystem connections","Eligible country events"] },
+  country_1000: { scope: "Country", amount: "$1,000", badge: "COUNTRY LEADERSHIP FOUNDER", title: "Country Leadership Founder", benefits: ["Country founder networking","Community leadership participation","Approved founder marketing resources","Merchant and ecosystem connections","Eligible country events and campaigns"] },
+  global_3000: { scope: "Global", amount: "$3,000", badge: "GLOBAL FOUNDER", title: "Global Founder", benefits: ["International founder networking","Cross-country collaboration","Eligible global events","Approved ecosystem and marketing resources","Merchant and ecosystem connections"] },
+  global_5000: { scope: "Global", amount: "$5,000", badge: "GLOBAL GROWTH FOUNDER", title: "Global Growth Founder", benefits: ["International founder networking","Cross-country collaboration","Global campaigns and events","Approved ecosystem and marketing resources","Merchant and ecosystem connections"] },
+  global_10000: { scope: "Global", amount: "$10,000", badge: "GLOBAL LEADERSHIP FOUNDER", title: "Global Leadership Founder", benefits: ["International founder networking","Cross-country collaboration","Global founder events","Approved ecosystem and marketing resources","Merchant and ecosystem connections","Founder leadership recognition"] },
+} as const;
+
 const benefits = [
   "International founder networking",
   "Cross-country collaboration opportunities",
@@ -53,7 +62,7 @@ function NavItem({ item }: { item: string[] }) {
 export default function Home() {
   const [wallet, setWallet] = useState("");
   const [walletStatus, setWalletStatus] = useState("Not connected");
-  const [profileSaved, setProfileSaved] = useState(false);
+  const [profileSaved, setProfileSaved] = useState(false);\n  const [membershipKey] = useState<keyof typeof membershipTiers | null>(null);
 
   useEffect(() => {
     const saved = window.localStorage.getItem("gbkFounderWallet");
@@ -199,6 +208,22 @@ export default function Home() {
           <div className="notice"><b>Founder tracking:</b> A successful on-chain swap can be used for eligible activity/referral tracking. A button click or swap attempt is not treated as a confirmed transaction. Final eligibility depends on the published program rules.</div>
         </section>
 
+        <section className="panel membershipStatusPanel" id="membership-status">
+          <div className="panelHead">
+            <div><h3>🏅 Founder Membership Status</h3><p>Your verified membership scope, amount, badge and benefits.</p></div>
+            <span className={`statusPill ${membershipKey ? "connected" : ""}`}>{membershipKey ? "MEMBERSHIP CONFIRMED" : "AWAITING VERIFICATION"}</span>
+          </div>
+          {membershipKey ? (() => {
+            const tier = membershipTiers[membershipKey];
+            return <div className="membershipDashboard">
+              <div className="membershipIdentity"><span className="membershipBadge">🏅 {tier.badge}</span><strong>{tier.title}</strong><small>{tier.scope} Founder · {tier.amount}</small></div>
+              <div className="membershipMeta"><div><span>Scope</span><b>{tier.scope} Wise</b></div><div><span>Confirmed Amount</span><b>{tier.amount}</b></div><div><span>Badge</span><b>{tier.badge}</b></div><div><span>Status</span><b>Confirmed ✓</b></div></div>
+              <div className="membershipBenefits"><b>Unlocked benefits</b>{tier.benefits.map(x=><span key={x}>✓ {x}</span>)}</div>
+            </div>;
+          })() : <div className="membershipPending"><strong>Connect wallet → membership verification → automatic dashboard badge</strong><span>After an approved membership record is verified, this panel is designed to show Country/Global scope, confirmed amount, matching badge and the benefits assigned to that tier.</span><div className="tierPreview">{Object.values(membershipTiers).map(t=><div key={t.amount+t.title}><b>{t.title}</b><small>{t.scope} · {t.amount}</small></div>)}</div></div>}
+          <div className="notice"><b>Verification rule:</b> A connected wallet alone does not confirm membership. Badge and benefits should activate only from a verified membership record.</div>
+        </section>
+
         <section className="panel founderCore" id="founder-core">
           <div className="panelHead"><div><h3>👤 Founder Core</h3><p>Connect your wallet and prepare your founder profile.</p></div><span className={`statusPill ${wallet ? "connected" : ""}`}>{wallet ? "WALLET CONNECTED" : "NOT CONNECTED"}</span></div>
           <div className="walletConnectBox">
@@ -211,7 +236,7 @@ export default function Home() {
               <div>
                 <span className="earnBadge">WALLET CONNECTED</span>
                 <b>💰 L1 / L2 Earn & Referral</b>
-                <small>Use the same connected wallet on app.gbkai.com to open the GBK Earn & Referral area and access your eligible PancakeSwap referral activity.</small>
+                <small>Use the same connected wallet on app.gbkai.com to open the GBK Earn & Referral area and access your eligible GBK referral activity.</small>
                 <div className="earnLevels"><span><strong>L1</strong> 6%</span><span><strong>L2</strong> 2%</span></div>
               </div>
               <div className="earnActions">
