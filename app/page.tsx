@@ -177,6 +177,28 @@ export default function Home() {
           <div className="notice"><b>Clear separation:</b> Holding GBK does not automatically make someone a Global Community Founder. Founder membership is a community/ecosystem participation program and does not promise token price appreciation, profits or guaranteed business results.</div>
         </section>
 
+        <section className="panel swapConfirmationPanel" id="swap-confirmation">
+          <div className="panelHead"><div><h3>🔄 GBK Swap Confirmation</h3><p>Record eligible swap activity only after the blockchain transaction is confirmed.</p></div><span className="badge">ON-CHAIN CONFIRMATION</span></div>
+          <div className="swapFlow">
+            <div className="swapStep"><span>1</span><b>Connect Wallet</b><small>Connect your supported BNB Smart Chain wallet.</small></div>
+            <div className="swapArrow">→</div>
+            <div className="swapStep"><span>2</span><b>Open GBK Swap</b><small>Complete your GBK swap through the supported swap route.</small></div>
+            <div className="swapArrow">→</div>
+            <div className="swapStep"><span>3</span><b>Confirm Transaction</b><small>Wait for the blockchain transaction to be confirmed.</small></div>
+          </div>
+          <div className="confirmationCard">
+            <div><b>Transaction status</b><strong>✓ Confirmed on BNB Smart Chain</strong><small>Eligible activity can be recorded only after successful on-chain confirmation.</small></div>
+            <a className="primary" href="https://app.gbkai.com" target="_blank" rel="noreferrer">Open GBK Swap ↗</a>
+          </div>
+          <div className="confirmationFields">
+            <div><span>Swap status</span><b>Confirmed</b></div>
+            <div><span>Transaction hash</span><b>Available after confirmation</b></div>
+            <div><span>GBK amount</span><b>Read from confirmed transaction</b></div>
+            <div><span>Wallet</span><b>Connected Founder wallet</b></div>
+          </div>
+          <div className="notice"><b>Founder tracking:</b> A successful on-chain swap can be used for eligible activity/referral tracking. A button click or swap attempt is not treated as a confirmed transaction. Final eligibility depends on the published program rules.</div>
+        </section>
+
         <section className="panel founderCore" id="founder-core">
           <div className="panelHead"><div><h3>👤 Founder Core</h3><p>Connect your wallet and prepare your founder profile.</p></div><span className={`statusPill ${wallet ? "connected" : ""}`}>{wallet ? "WALLET CONNECTED" : "NOT CONNECTED"}</span></div>
           <div className="walletConnectBox">
