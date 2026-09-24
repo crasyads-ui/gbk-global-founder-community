@@ -1,1 +1,65 @@
-"use client";import {useState} from "react";import Link from "next/link";const events=[["OCT 04","GBK Global Founder Meet","Online","Global","Founder networking, ecosystem updates and Q&A."],["OCT 11","Blockchain + AI Workshop","Hyderabad","Country","Practical introduction to blockchain and AI products."],["OCT 18","Merchant Ecosystem Day","Dubai","Regional","Merchant onboarding, digital payments and marketplace collaboration."],["OCT 25","Global Community Forum","Online","Global","Cross-country founder presentations and community discussion."]];export default function Events(){const[registered,setRegistered]=useState<string[]>([]);return <main className="featurePage"><header className="featureHeader"><Link href="/" className="back">← Dashboard</Link><span className="pill">FOUNDER EVENTS</span><h1>Events & Participation</h1><p>Discover, register and participate in GBK founder, education and ecosystem events.</p></header><section className="eventList">{events.map(([date,title,place,type,desc])=><article className="event" key={title}><div className="date">{date.split(" ")[0]}<b>{date.split(" ")[1]}</b></div><div className="eventInfo"><span>{type} • {place}</span><h2>{title}</h2><p>{desc}</p></div><button onClick={()=>setRegistered(r=>r.includes(title)?r.filter(x=>x!==title):[...r,title])}>{registered.includes(title)?"Registered ✓":"Participate →"}</button></article>)}</section><div className="learningBanner"><div><span className="pill">PARTICIPATION RECORD</span><h2>Build a verifiable founder activity history.</h2><p>Future versions can connect registration, attendance, learning completion and community contributions into a founder profile.</p></div><Link href="/learn">Start Learning →</Link></div></main>
+"use client";
+
+import { useState } from "react";
+import Link from "next/link";
+
+const events = [
+  ["OCT 04", "GBK Global Founder Meet", "Online", "Global", "Founder networking, ecosystem updates and Q&A."],
+  ["OCT 11", "Blockchain + AI Workshop", "Hyderabad", "Country", "Practical introduction to blockchain and AI products."],
+  ["OCT 18", "Merchant Ecosystem Day", "Dubai", "Regional", "Merchant onboarding, digital payments and marketplace collaboration."],
+  ["OCT 25", "Global Community Forum", "Online", "Global", "Cross-country founder presentations and community discussion."],
+];
+
+export default function Events() {
+  const [registered, setRegistered] = useState<string[]>([]);
+
+  const toggleRegistration = (title: string) => {
+    setRegistered((current) =>
+      current.includes(title)
+        ? current.filter((item) => item !== title)
+        : [...current, title]
+    );
+  };
+
+  return (
+    <main className="featurePage">
+      <header className="featureHeader">
+        <Link href="/" className="back">← Dashboard</Link>
+        <span className="pill">FOUNDER EVENTS</span>
+        <h1>Events &amp; Participation</h1>
+        <p>Discover, register and participate in GBK founder, education and ecosystem events.</p>
+      </header>
+
+      <section className="eventList">
+        {events.map(([date, title, place, type, desc]) => (
+          <article className="event" key={title}>
+            <div className="date">
+              {date.split(" ")[0]}
+              <b>{date.split(" ")[1]}</b>
+            </div>
+            <div className="eventInfo">
+              <span>{type} • {place}</span>
+              <h2>{title}</h2>
+              <p>{desc}</p>
+            </div>
+            <button onClick={() => toggleRegistration(title)}>
+              {registered.includes(title) ? "Registered ✓" : "Participate →"}
+            </button>
+          </article>
+        ))}
+      </section>
+
+      <div className="learningBanner">
+        <div>
+          <span className="pill">PARTICIPATION RECORD</span>
+          <h2>Build a verifiable founder activity history.</h2>
+          <p>
+            Future versions can connect registration, attendance, learning completion
+            and community contributions into a founder profile.
+          </p>
+        </div>
+        <Link href="/learn">Start Learning →</Link>
+      </div>
+    </main>
+  );
+}
