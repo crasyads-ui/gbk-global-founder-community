@@ -99,16 +99,42 @@ export default function Home() {
 
         <section className="panel installPanel" id="install"><div className="panelHead"><div><h3>📲 Install GBK Founder</h3><p>Add this website to your phone home screen for quick access.</p></div><span className="badge">PWA</span></div><div className="installGrid"><div><b>Android</b><small>Open the site in Chrome → browser menu → Add to Home screen.</small></div><div><b>iPhone</b><small>Open in Safari → Share → Add to Home Screen.</small></div></div></section>
 
-        <section className="panel rebasePanel" id="rebase">
-          <div className="panelHead"><div><h3>🔄 GBK Buy & Hold · Automatic Token Increase</h3><p>Hold eligible GBK and receive additional GBK tokens through the rebase mechanism.</p></div><span className="badge">~3%–27% / MONTH</span></div>
-          <div className="rebaseGrid">
-            <div className="rebaseCard"><span>1</span><b>Buy GBK</b><small>Acquire GBK through the supported swap route.</small></div>
-            <div className="rebaseCard"><span>2</span><b>Hold GBK</b><small>Keep eligible GBK in your supported BNB Smart Chain wallet.</small></div>
-            <div className="rebaseCard"><span>3</span><b>Automatic Rebase</b><small>The token balance can increase automatically according to applicable protocol rules and activity.</small></div>
-            <div className="rebaseCard"><span>4</span><b>More GBK Tokens</b><small>The bonus is additional GBK tokens, not a separate reward token.</small></div>
+        <section className="panel dailyRewardsPanel" id="daily-rewards">
+          <div className="panelHead">
+            <div><h3>🌍 GBK Buy • Hold • Daily Rewards</h3><p>Simple global explanation for eligible GBK holders.</p></div>
+            <span className="badge">0.1%–0.9% DAILY</span>
           </div>
-          <div className="rebaseExample"><b>Illustrative example:</b> 100,000 GBK + 10% rebase = 110,000 GBK. The monthly percentage varies; approximately 3%–27% is the stated range. Token quantity and market value are separate. GBK price depends on market supply, demand and market capitalization.</div>
-          <div className="notice">The 3%–27% range is presented as a variable token-balance increase, not a guaranteed monetary return or guaranteed market-value increase. Actual results depend on the applicable GBK contract/protocol rules and activity.</div>
+          <div className="dailyHero">
+            <b>How it works</b>
+            <strong>Buy GBK → Hold GBK → Receive additional GBK tokens automatically</strong>
+            <small>Eligible holders can receive an automatic daily token-balance increase through the rebase mechanism, subject to the applicable protocol rules and activity.</small>
+          </div>
+          <div className="rebaseGrid">
+            <div className="rebaseCard"><span>1</span><b>Buy GBK</b><small>Acquire GBK through a supported GBK swap route.</small></div>
+            <div className="rebaseCard"><span>2</span><b>Hold GBK</b><small>Keep eligible GBK in a supported BNB Smart Chain wallet.</small></div>
+            <div className="rebaseCard"><span>3</span><b>Daily Increase</b><small>Approximately 0.1%–0.9% additional GBK tokens per day, depending on applicable rules and activity.</small></div>
+            <div className="rebaseCard"><span>4</span><b>Use Your GBK</b><small>GBK can be swapped or transferred subject to wallet, contract, liquidity and transaction conditions.</small></div>
+          </div>
+          <div className="dailyExamples">
+            <div><b>10,000 GBK</b><span>0.1% → +10 GBK · 0.5% → +50 GBK · 0.9% → +90 GBK</span></div>
+            <div><b>100,000 GBK</b><span>0.1% → +100 GBK · 0.5% → +500 GBK · 0.9% → +900 GBK</span></div>
+            <div><b>1,000,000 GBK</b><span>0.1% → +1,000 GBK · 0.5% → +5,000 GBK · 0.9% → +9,000 GBK</span></div>
+          </div>
+          <div className="notice"><b>Global currency:</b> GBK rewards are additional GBK tokens, not INR or another fiat currency. Their market value can be viewed in USD, EUR, INR, AED, GBP and other currencies, but the market value is determined separately by GBK market conditions, supply, demand and market capitalization.</div>
+          <div className="notice"><b>Important:</b> The 0.1%–0.9% range describes token quantity, not a guaranteed monetary return or guaranteed increase in market value. Actual results depend on the applicable GBK contract/protocol rules and activity.</div>
+        </section>
+
+        <section className="panel founderSeparatePanel" id="global-founder">
+          <div className="panelHead">
+            <div><h3>🏆 GBK Global Community Founder</h3><p>A separate community and ecosystem participation program — not part of the daily token-reward mechanism.</p></div>
+            <span className="badge">SEPARATE PROGRAM</span>
+          </div>
+          <div className="separateGrid">
+            <div className="separateCard"><b>Country Founder</b><strong>$300 · $500 · $1,000</strong><small>Country-level networking, local events, community participation and ecosystem initiatives.</small></div>
+            <div className="separateCard"><b>Global Founder</b><strong>$3,000 · $5,000 · $10,000</strong><small>International founder networking, cross-country collaboration, global events and ecosystem initiatives.</small></div>
+            <div className="separateCard"><b>Founder Participation</b><strong>Build • Connect • Participate</strong><small>Support communities, merchants, content, events and approved GBK ecosystem initiatives.</small></div>
+          </div>
+          <div className="notice"><b>Clear separation:</b> Holding GBK does not automatically make someone a Global Community Founder. Founder membership is a community/ecosystem participation program and does not promise token price appreciation, profits or guaranteed business results.</div>
         </section>
 
         <section className="panel founderCore" id="founder-core"><div className="panelHead"><div><h3>👤 Founder Core</h3><p>Start here to build your founder profile and participation record.</p></div><span className="badge">CORE</span></div><div className="coreGrid"><div className="coreCard"><b>1. Connect / Sign In</b><small>Connect your supported wallet or use the available sign-in flow.</small><a href="https://app.gbkai.com" target="_blank" rel="noreferrer">Open GBK App ↗</a></div><div className="coreCard"><b>2. Complete Profile</b><small>Name, country, city, preferred language, social links and founder focus.</small><button className="hubBtn" type="button">Profile Setup</button></div><div className="coreCard"><b>3. Membership</b><small>Country Founder: $300 / $500 / $1,000 · Global Founder: $3,000 / $5,000 / $10,000.</small><a href="#programs">View Programs →</a></div><div className="coreCard"><b>4. Verification</b><small>Membership and founder status should be verified before badges or restricted benefits are activated.</small><span className="statusPill">VERIFICATION READY</span></div></div><div className="notice">Membership is community/ecosystem participation. Prices, eligibility, verification and benefits should follow the published program terms.</div></section>
