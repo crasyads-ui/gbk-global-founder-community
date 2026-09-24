@@ -312,6 +312,40 @@ function makePdf() {
       }
     }
 
+    // Illustrative growth visuals: scenario values only, not measured results or forecasts.
+    if (pageIndex === 8 || pageIndex === 9) {
+      const chartX = 60, chartY = 145, chartW = 475, chartH = 145;
+      const years = ["2026", "2027", "2028", "2029", "2030"];
+      const values = pageIndex === 8 ? [100, 175, 300, 500, 800] : [100, 160, 280, 460, 720];
+      const maxValue = 800;
+      const px = (i: number) => chartX + (chartW / 4) * i;
+      const py = (v: number) => chartY + (v / maxValue) * chartH;
+
+      // Chart frame and grid.
+      cmds.push("q", "0.92 0.94 0.97 RG", "0.5 w");
+      cmds.push(chartX + " " + chartY + " m", chartX + " " + (chartY + chartH) + " l", (chartX + chartW) + " " + (chartY + chartH) + " l", (chartX + chartW) + " " + chartY + " l", "h", "S", "Q");
+      [0, 200, 400, 600, 800].forEach((v) => {
+        const yy = py(v);
+        cmds.push("q", "0.88 0.91 0.95 RG", "0.35 w", chartX + " " + yy + " m", (chartX + chartW) + " " + yy + " l", "S", "Q");
+        addText("F1", 7, 34, yy - 3, String(v));
+      });
+
+      // Smooth-looking scenario line built from multiple points.
+      cmds.push("q", "0.08 0.42 0.78 RG", "3 w");
+      cmds.push(px(0) + " " + py(values[0]) + " m");
+      for (let i = 1; i < values.length; i++) cmds.push(px(i) + " " + py(values[i]) + " l");
+      cmds.push("S", "Q");
+
+      values.forEach((v, i) => {
+        cmds.push("q", "0.08 0.42 0.78 rg", px(i) + " " + py(v) + " 7 7 re", "f", "Q");
+        addText("F2", 7.5, px(i) - 8, chartY - 18, years[i]);
+      });
+
+      addText("F2", 10, 60, 320, "Illustrative ecosystem growth scenario");
+      addText("F1", 7.5, 60, 307, "Index: 2026 = 100. Scenario values are planning examples, not measured data or forecasts.");
+      addText("F1", 7.5, 60, 125, pageIndex === 8 ? "Example measure: ecosystem activity index" : "Example measure: network activity index");
+    }
+
     // Footer and page number.
     fillRect(0.88, 0.90, 0.95, 50, 45, 495, 1);
     addText("F1", 7.5, 50, 30, "GBK Future Ecosystem Guide  |  Planning document  |  Verify current rules on official GBK applications");
