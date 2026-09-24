@@ -392,13 +392,13 @@ export default function Home() {
           <div className="swapFlow">
             <div className="swapStep"><span>1</span><b>Connect Wallet</b><small>Use the same BNB Smart Chain wallet for the membership purchase.</small></div>
             <div className="swapArrow">→</div>
-            <div className="swapStep"><span>2</span><b>Complete Selected Amount</b><small>Spend at least the selected USD tier in USDT and receive GBK in the same wallet.</small></div>
+            <div className="swapStep"><span>2</span><b>Complete Purchase</b><small>Complete the selected membership amount in USDT → GBK using the same wallet.</small></div>
             <div className="swapArrow">→</div>
             <div className="swapStep"><span>3</span><b>Verify</b><small>Backend checks the confirmed BSC transaction, sender, USDT spent and GBK received.</small></div>
           </div>
           <div className="confirmationCard">
             <div><b>Selected membership</b><strong>{selectedTier ? `${membershipTiers[selectedTier].title} · ${membershipTiers[selectedTier].amount}` : "Choose a membership level above"}</strong><small>Membership verification uses the selected USD threshold; no private key or seed phrase is requested.</small></div>
-            <a className="primary" href="https://app.gbkai.com" target="_blank" rel="noreferrer">Open GBK Swap ↗</a>
+            <a className="primary" href="https://app.gbkai.com" target="_blank" rel="noreferrer">{selectedTier ? `Complete ${membershipTiers[selectedTier].amount} GBK Purchase ↗` : "Open GBK Swap ↗"}</a>
           </div>
           <div className="confirmationFields">
             <div><span>Verification status</span><b>{verificationStatus}</b></div>
@@ -410,7 +410,7 @@ export default function Home() {
             <input value={txHash} onChange={(e) => setTxHash(e.target.value.trim())} placeholder="0x… BSC transaction hash" aria-label="BSC transaction hash" />
             <button className="primary" type="button" disabled={!wallet || !selectedTier || !txHash} onClick={verifyFounderTransaction}>Verify Transaction</button>
           </div>
-          <div className="notice"><b>Automatic checks:</b> successful BSC receipt → connected wallet is the transaction sender → selected USDT threshold is met → GBK is received by the same wallet → activation GBK balance is recorded → Founder status is activated. The dashboard then checks the 50% holding rule.</div>
+          <div className="notice"><b>Automatic checks:</b> successful BSC receipt → connected wallet is the transaction sender → selected USDT threshold is met → GBK is received by the same wallet → activation GBK balance is recorded → Founder status is activated. The dashboard then checks the 50% holding rule. No seed phrase or private key is ever requested.</div>
         </section>
 
         <section className="panel membershipStatusPanel" id="membership-status">
