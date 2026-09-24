@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const nav = [
   ["Overview", "/", "⌂"],
@@ -64,6 +64,7 @@ export default function Home() {
   const [walletStatus, setWalletStatus] = useState("Not connected");
   const [profileSaved, setProfileSaved] = useState(false);
   const [membershipKey] = useState<keyof typeof membershipTiers | null>(null);
+  const walletConnectProviderRef = useRef<any>(null);
 
   type EthereumProvider = {
     request: (args: { method: string; params?: unknown[] }) => Promise<unknown>;
@@ -108,30 +109,121 @@ export default function Home() {
     };
   }, []);
 
+  async function ensureBscNetwork(provider: EthereumProvider) {
+    try {
+      const chainId = await provider.request({ method: "eth_chainId" }) as string;
+      if (chainId?.toLowerCase() === "0x38") return;
+    } catch {}
+
+    try {
+      await provider.request({
+        method: "wallet_switchEthereumChain",
+        params: [{ chainId: "0x38" }],
+      });
+    } catch (switchError) {
+      const code = typeof switchError === "object" && switchError !== null && "code" in switchError
+        ? (switchError as { code?: number }).code
+        : undefined;
+      if (code === 4902) {
+        await provider.request({
+          method: "wallet_addEthereumChain",
+          params: [{
+            chainId: "0x38",
+            chainName: "BNB Smart Chain",
+            nativeCurrency: { name: "BNB", symbol: "BNB", decimals: 18 },
+            rpcUrls: ["https://bsc-dataseed.binance.org/"],
+            blockExplorerUrls: ["https://bscscan.com/"],
+          }],
+        });
+      } else {
+        throw switchError;
+      }
+    }
+  }
+
+  async function connectWalletConnect() {
+    setWalletStatus("Opening wallet selector…");
+    const { EthereumProvider } = await import("@walletconnect/ethereum-provider");
+    let provider = walletConnectProviderRef.current;
+
+    if (!provider) {
+      provider = await EthereumProvider.init({
+        projectId: "19d21bb0657b8a691c0ea8f4976ce26e",
+        optionalChains: [56],
+        showQrModal: true,
+        rpcMap: { 56: "https://bsc-dataseed.binance.org/" },
+        metadata: {
+          name: "GBK Global Founder Community",
+          description: "GBK Founder Community on BNB Smart Chain",
+          url: "https://founder.gbkai.com",
+          icons: ["https://founder.gbkai.com/favicon.ico"],
+        },
+      });
+      walletConnectProviderRef.current = provider;
+
+      provider.on("accountsChanged", (accounts: string[]) => {
+        const address = accounts?.[0];
+        if (address) {
+          setWallet(address);
+          window.localStorage.setItem("gbkFounderWallet", address);
+          setWalletStatus("Connected");
+        } else {
+          setWallet("");
+          setWalletStatus("Not connected");
+          window.localStorage.removeItem("gbkFounderWallet");
+        }
+      });
+      provider.on("chainChanged", () => setWalletStatus("Connected · network changed"));
+      provider.on("disconnect", () => {
+        setWallet("");
+        setWalletStatus("Not connected");
+        window.localStorage.removeItem("gbkFounderWallet");
+      });
+    }
+
+    if (!provider.session) {
+      await provider.connect();
+    }
+
+    const accounts = await provider.request({ method: "eth_requestAccounts" }) as string[];
+    const address = accounts?.[0];
+    if (!address) throw new Error("No wallet account returned");
+    await ensureBscNetwork(provider);
+
+    setWallet(address);
+    window.localStorage.setItem("gbkFounderWallet", address);
+    setWalletStatus("Connected");
+  }
+
   async function connectWallet() {
     const ethereum = (window as Window & { ethereum?: EthereumProvider }).ethereum;
-    if (!ethereum) {
-      setWalletStatus("No compatible wallet found. Open Founder in your BNB Smart Chain wallet browser or use a compatible wallet.");
-      return;
-    }
 
     try {
       setWalletStatus("Connecting…");
-      const accounts = await ethereum.request({ method: "eth_requestAccounts" }) as string[];
-      const address = accounts?.[0];
+      if (ethereum) {
+        const accounts = await ethereum.request({ method: "eth_requestAccounts" }) as string[];
+        const address = accounts?.[0];
+        if (!address) throw new Error("No wallet account returned");
+        await ensureBscNetwork(ethereum);
+        setWallet(address);
+        window.localStorage.setItem("gbkFounderWallet", address);
+        setWalletStatus("Connected");
+        return;
+      }
 
-      if (!address) throw new Error("No wallet account returned");
-
-      setWallet(address);
-      window.localStorage.setItem("gbkFounderWallet", address);
-      setWalletStatus("Connected");
+      await connectWalletConnect();
     } catch (error) {
       const message = error instanceof Error ? error.message : "Wallet connection cancelled.";
       setWalletStatus(message);
     }
   }
 
-  function disconnectWallet() {
+  async function disconnectWallet() {
+    try {
+      if (walletConnectProviderRef.current?.session) {
+        await walletConnectProviderRef.current.disconnect();
+      }
+    } catch {}
     setWallet("");
     setWalletStatus("Not connected");
     window.localStorage.removeItem("gbkFounderWallet");
@@ -267,10 +359,11 @@ export default function Home() {
         <section className="panel founderCore" id="founder-core">
           <div className="panelHead"><div><h3>👤 Founder Core</h3><p>Connect your wallet and prepare your founder profile.</p></div><span className={`statusPill ${wallet ? "connected" : ""}`}>{wallet ? "WALLET CONNECTED" : "NOT CONNECTED"}</span></div>
           <div className="walletConnectBox">
-            <div><b>{wallet ? `Connected: ${shortWallet}` : "Connect your BNB Smart Chain wallet"}</b><small>{wallet ? "Wallet address is saved on this device for the Founder dashboard." : "Use a compatible BNB Smart Chain wallet. Wallet connection does not by itself confirm Founder membership."}</small></div>
+            <div><b>{wallet ? `Connected: ${shortWallet}` : "Connect your BNB Smart Chain wallet"}</b><small>{wallet ? "Wallet connected. Founder membership still requires separate verification." : "Connect from a wallet app or from any normal browser using the secure WalletConnect selector. BNB Smart Chain is required."}</small></div>
             <div className="walletActions">{wallet ? <button className="hubBtn" type="button" onClick={disconnectWallet}>Disconnect</button> : <button className="primary" type="button" onClick={connectWallet}>🔗 Connect Wallet</button>}</div>
           </div>
           <div className="walletStatus">{walletStatus}</div>
+          {!wallet && <div className="walletHint">🔐 Secure mobile connection: normal browsers can use WalletConnect to open a supported wallet.</div>}
           {wallet && (
             <div className="earnReferralBox">
               <div>
@@ -291,7 +384,7 @@ export default function Home() {
             <div className="coreCard"><b>3. Membership</b><small>Country Founder: $300 / $500 / $1,000 · Global Founder: $3,000 / $5,000 / $10,000.</small><a href="#programs">View Programs →</a></div>
             <div className="coreCard"><b>4. Verification</b><small>Membership and founder status must be verified before badges or restricted benefits are activated.</small><span className="statusPill">VERIFICATION READY</span></div>
           </div>
-          <div className="notice">Wallet connection is now enabled. A production membership/profile system still requires a secure backend authentication flow and database verification; the dashboard does not treat a connected wallet as proof of membership.</div>
+          <div className="notice">Wallet connection supports injected BNB wallets and WalletConnect for normal mobile/desktop browsers. A production membership/profile system still requires secure backend authentication and database verification; a connected wallet is not proof of membership.</div>
         </section>
 
         <section className="panel founderHub" id="founder-hub"><div className="panelHead"><div><h3>🚀 Founder Workspace</h3><p>Share GBK content, invite genuine community members and track your campaign activity.</p></div><span className="badge">FOUNDER TOOLS</span></div><div className="hubGrid"><div className="hubCard"><b>🔗 Your GBK Share Link</b><small>Use the official ecosystem entry point when sharing. Copy it once, then post through your own social accounts.</small><button className="hubBtn" onClick={() => navigator.clipboard?.writeText("https://app.gbkai.com")}>Copy GBK Link</button></div><div className="hubCard"><b>📣 Social Share</b><small>Share the GBK ecosystem through supported social platforms. Review content before posting.</small><div className="shareRow"><a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fapp.gbkai.com" target="_blank" rel="noreferrer">Facebook</a><a href="https://twitter.com/intent/tweet?url=https%3A%2F%2Fapp.gbkai.com&text=Explore%20the%20GBK%20ecosystem" target="_blank" rel="noreferrer">X</a><a href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fapp.gbkai.com" target="_blank" rel="noreferrer">LinkedIn</a><a href="https://wa.me/?text=Explore%20the%20GBK%20ecosystem%20https%3A%2F%2Fapp.gbkai.com" target="_blank" rel="noreferrer">WhatsApp</a></div></div><div className="hubCard"><b>🎬 Short Video Hub</b><small>Ready-to-share topics: What is GBK? · How GBK Swap works · Buy & Hold · AI Marketplace · Learn · Agri.</small><Link className="hubBtn" href="/tools">Open Content Studio →</Link></div><div className="hubCard"><b>📊 Founder Analytics</b><small>Track content reach, website visits, wallet connections, successful swaps and returning users once live analytics is connected.</small><Link className="hubBtn" href="/tools">Open Analytics →</Link></div></div></section>
