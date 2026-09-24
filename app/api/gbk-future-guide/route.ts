@@ -216,57 +216,140 @@ function esc(s: string) {
   return s.replace(/\\/g, "\\\\").replace(/\(/g, "\\(").replace(/\)/g, "\\)");
 }
 
+function wrapText(text: string, maxChars: number) {
+  if (!text) return [""];
+  const words = text.split(/\s+/);
+  const lines: string[] = [];
+  let current = "";
+  for (const word of words) {
+    const next = current ? current + " " + word : word;
+    if (next.length > maxChars && current) {
+      lines.push(current);
+      current = word;
+    } else {
+      current = next;
+    }
+  }
+  if (current) lines.push(current);
+  return lines;
+}
+
 function makePdf() {
   const objects: string[] = [];
   const add = (body: string) => { objects.push(body); return objects.length; };
   const catalog = add("");
   const pagesObj = add("");
-  const font = add("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>");
+  const regularFont = add("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>");
+  const boldFont = add("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>");
   const pageIds: number[] = [];
   const contentIds: number[] = [];
 
-  pages.forEach((page) => {
-    const cmds: string[] = [
-      "BT",
-      "/F1 20 Tf",
-      "50 760 Td",
-      "(GBK GLOBAL ECOSYSTEM) Tj",
-      "0 -32 Td",
-      "/F1 15 Tf",
-      "(" + esc(page.title) + ") Tj",
-      "0 -28 Td",
-      "/F1 10 Tf"
-    ];
+  // Keep the guide to exactly 10 pages: combine the cover/overview with the first ecosystem overview.
+  const renderPages = [
+    {
+      title: "GBK GLOBAL ECOSYSTEM",
+      subtitle: "Future Vision and Practical Roadmap",
+      lines: [...pages[0].lines, "", ...pages[1].lines]
+    },
+    ...pages.slice(2)
+  ];
+
+  renderPages.forEach((page, pageIndex) => {
+    const cmds: string[] = [];
+    const addText = (fontRef: string, size: number, x: number, y: number, text: string) => {
+      cmds.push("BT", "/" + fontRef + " " + size + " Tf", x + " " + y + " Td", "(" + esc(text) + ") Tj", "ET");
+    };
+    const fillRect = (r: number, g: number, b: number, x: number, y: number, w: number, h: number) => {
+      cmds.push("q", r + " " + g + " " + b + " rg", x + " " + y + " " + w + " " + h + " re", "f", "Q");
+    };
+
+    // Clean white page with a professional GBK header band.
+    fillRect(0.035, 0.075, 0.12, 0, 792, 595, 50);
+    fillRect(0.12, 0.55, 0.95, 50, 792, 95, 4);
+    addText("F2", 12, 50, 812, "GBK GLOBAL ECOSYSTEM");
+    addText("F1", 8, 435, 812, "PLANNING DOCUMENT");
+
+    let y = 750;
+    addText("F2", pageIndex === 0 ? 26 : 22, 50, y, page.title);
+    y -= pageIndex === 0 ? 30 : 26;
     if (page.subtitle) {
-      cmds.push("(" + esc(page.subtitle) + ") Tj", "0 -24 Td");
+      addText("F1", 13, 50, y, page.subtitle);
+      y -= 26;
     }
-    page.lines.forEach((line) => {
-      cmds.push("(" + esc(line) + ") Tj", "0 -15 Td");
-    });
-    cmds.push("ET");
+
+    for (const raw of page.lines) {
+      if (y < 90) break;
+      const line = raw.trim();
+
+      if (!line) {
+        y -= 9;
+        continue;
+      }
+
+      const isSectionLabel =
+        line.endsWith(":") ||
+        /^(Find|Invite|Submit|Verify|Publish|Improve|Hold|Daily token increase|Monthly illustration|Timing|Value distinction|Security|Easy entry|Transparent execution|Liquidity depth|Analytics|Cross-chain future|Priority|Future opportunity|Goal|Merchant journey|Founder membership|Content strategy|Measure quality, not vanity numbers|Phase [1-5])/i.test(line);
+
+      const isMajor =
+        /^d+\./.test(line) ||
+        /^(HOLD ->|DISCOVER ->|ASK ->|FIND ->|Listen ->|HOLDERS ->)/.test(line);
+
+      if (isSectionLabel || isMajor) {
+        const heading = line.replace(/:$/, "");
+        y -= isMajor ? 7 : 3;
+        if (y < 90) break;
+        fillRect(0.08, 0.42, 0.78, 50, y - 4, 3, 17);
+        addText("F2", isMajor ? 15 : 12, 60, y, heading);
+        y -= isMajor ? 23 : 19;
+        continue;
+      }
+
+      const wrapped = wrapText(line, 76);
+      for (const part of wrapped) {
+        if (y < 90) break;
+        addText("F1", 11.5, 60, y, part);
+        y -= 17;
+      }
+    }
+
+    // Footer and page number.
+    fillRect(0.88, 0.90, 0.95, 50, 45, 495, 1);
+    addText("F1", 7.5, 50, 30, "GBK Future Ecosystem Guide  |  Planning document  |  Verify current rules on official GBK applications");
+    addText("F1", 8, 535, 30, String(pageIndex + 1) + " / " + renderPages.length);
+
     const stream = cmds.join("\n");
-    const cid = add("<< /Length " + stream.length + " >>\nstream\n" + stream + "\nendstream");
+    const cid = add("<< /Length " + Buffer.byteLength(stream, "latin1") + " >>\nstream\n" + stream + "\nendstream");
     const pid = add("");
     contentIds.push(cid);
     pageIds.push(pid);
   });
 
   pageIds.forEach((pid, i) => {
-    objects[pid - 1] = "<< /Type /Page /Parent " + pagesObj + " 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 " + font + " 0 R >> >> /Contents " + contentIds[i] + " 0 R >>";
+    objects[pid - 1] =
+      "<< /Type /Page /Parent " + pagesObj +
+      " 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 " + regularFont +
+      " 0 R /F2 " + boldFont +
+      " 0 R >> >> /Contents " + contentIds[i] + " 0 R >>";
   });
-  objects[pagesObj - 1] = "<< /Type /Pages /Kids [" + pageIds.map(id => id + " 0 R").join(" ") + "] /Count " + pageIds.length + " >>";
+
+  objects[pagesObj - 1] =
+    "<< /Type /Pages /Kids [" + pageIds.map(id => id + " 0 R").join(" ") +
+    "] /Count " + pageIds.length + " >>";
   objects[catalog - 1] = "<< /Type /Catalog /Pages " + pagesObj + " 0 R >>";
 
   let pdf = "%PDF-1.4\n";
   const offsets: number[] = [0];
   objects.forEach((obj, idx) => {
-    offsets.push(pdf.length);
+    offsets.push(Buffer.byteLength(pdf, "latin1"));
     pdf += (idx + 1) + " 0 obj\n" + obj + "\nendobj\n";
   });
-  const xref = pdf.length;
+
+  const xref = Buffer.byteLength(pdf, "latin1");
   pdf += "xref\n0 " + (objects.length + 1) + "\n";
   pdf += "0000000000 65535 f \n";
-  offsets.slice(1).forEach(o => { pdf += String(o).padStart(10, "0") + " 00000 n \n"; });
+  offsets.slice(1).forEach((o) => {
+    pdf += String(o).padStart(10, "0") + " 00000 n \n";
+  });
   pdf += "trailer\n<< /Size " + (objects.length + 1) + " /Root " + catalog + " 0 R >>\nstartxref\n" + xref + "\n%%EOF";
   return pdf;
 }
