@@ -144,3 +144,71 @@ body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,
  .quickBuyAction .primary{width:100%!important}
 }
 @media(max-width:430px){.leadGrid{grid-template-columns:1fr!important}.topWallet .hubBtn,.topWallet .primary{padding:9px 11px!important;font-size:11px!important}}
+
+
+/* Founder UX v3 — clearer hierarchy, larger type, premium light fintech styling */
+#founder-core{background:linear-gradient(180deg,#ffffff 0%,#fbfdff 100%)!important}
+#founder-core .membershipQuickBuy{margin-top:18px!important;padding:22px!important;background:#fff!important;border:1px solid #dbe4f0!important;border-radius:20px!important;box-shadow:0 10px 28px rgba(15,23,42,.05)!important}
+.stepLabel{display:flex;align-items:center;gap:12px;padding:4px 0 18px!important}
+.stepLabel>span{width:38px;height:38px;display:grid;place-items:center;border-radius:12px;background:linear-gradient(135deg,#2563eb,#7c3aed);color:#fff;font-size:18px;font-weight:900;box-shadow:0 7px 16px rgba(79,70,229,.20)}
+.stepLabel b{display:block;font-size:20px!important;line-height:1.2;color:#172554!important;letter-spacing:-.3px}
+.stepLabel small{display:block;margin-top:4px;color:#64748b!important;font-size:12px!important;line-height:1.45}
+.quickBuyHead{padding:15px 0 4px!important;border-top:1px solid #eef2f7}
+.quickBuyHead b{font-size:18px!important;color:#172554!important}
+.quickBuyHead small{font-size:12px!important;color:#64748b!important}
+.tierGroup{margin-top:18px!important}
+.tierGroupTitle{display:flex;align-items:center;gap:11px;margin-bottom:10px}
+.tierGroupTitle>span{width:36px;height:36px;display:grid;place-items:center;border-radius:11px;background:#f1f5ff;font-size:19px}
+.tierGroupTitle b{display:block;font-size:16px!important;color:#172554!important}
+.tierGroupTitle small{display:block;margin-top:2px;font-size:11px!important;color:#64748b!important}
+.tierButtons{gap:12px!important}
+.tierButton{min-height:116px!important;padding:17px!important;border-radius:16px!important;border:1px solid #dce4ef!important;background:#fff!important;display:flex!important;flex-direction:column!important;justify-content:center!important;align-items:flex-start!important;position:relative!important;transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease,background .16s ease!important}
+.tierButton:hover:not(:disabled){transform:translateY(-2px)!important;border-color:#93c5fd!important;box-shadow:0 8px 20px rgba(37,99,235,.09)!important}
+.tierButton.selected{border:2px solid #4f46e5!important;background:linear-gradient(145deg,#eef5ff,#f6f0ff)!important;box-shadow:0 10px 24px rgba(79,70,229,.14)!important}
+.tierButton.selected:after{content:"✓ SELECTED";position:absolute;right:10px;top:10px;padding:4px 7px;border-radius:999px;background:#4f46e5;color:#fff;font-size:8px;font-weight:900;letter-spacing:.6px}
+.tierButton .tierScope{font-size:10px!important;color:#64748b!important;text-transform:uppercase!important;letter-spacing:1px!important;margin:0 0 6px!important}
+.tierButton b{font-size:17px!important;line-height:1.22!important;color:#172554!important}
+.tierButton strong{margin-top:8px!important;font-size:21px!important;line-height:1!important;color:#2563eb!important;font-weight:800!important}
+.quickBuyAction{margin-top:20px!important;padding:16px!important;border-radius:15px!important;background:#f8fafc!important;border:1px solid #e2e8f0!important}
+.quickBuyAction>b{font-size:15px!important;color:#172554!important;line-height:1.35}
+.quickBuyAction .primary{font-size:14px!important;font-weight:800!important;padding:13px 18px!important}
+.referralInputRow input{font-size:15px!important;padding:14px 15px!important}
+.referralInputRow span{font-size:11px!important;color:#64748b!important}
+#swap-confirmation{background:linear-gradient(180deg,#ffffff,#fbfdff)!important}
+#swap-confirmation .stepLabel{padding-bottom:15px!important}
+#swap-confirmation .confirmationCard{margin-top:14px!important;padding:20px!important;border-radius:18px!important}
+#swap-confirmation .confirmationCard b{font-size:11px!important;letter-spacing:1px!important;color:#64748b!important}
+#swap-confirmation .confirmationCard strong{font-size:21px!important;line-height:1.3!important;color:#172554!important}
+#swap-confirmation .confirmationCard small{font-size:12px!important;line-height:1.5!important}
+#swap-confirmation .confirmationFields{gap:12px!important;margin-top:14px!important}
+#swap-confirmation .confirmationFields>div{padding:14px!important;background:#f8fafc!important;border:1px solid #e2e8f0!important;border-radius:13px!important}
+#swap-confirmation .confirmationFields span{font-size:10px!important;color:#64748b!important;letter-spacing:.7px!important}
+#swap-confirmation .confirmationFields b{margin-top:6px!important;font-size:14px!important;color:#172554!important;line-height:1.4!important}
+.verifyBox{margin-top:16px!important;padding:16px!important;border:1px solid #dbe4f0!important;border-radius:16px!important;background:#f8fafc!important}
+.verifyBox label{display:block!important;margin-bottom:8px!important;font-size:13px!important;font-weight:800!important;color:#172554!important}
+.confirmationInputRow{display:flex!important;gap:10px!important}
+.confirmationInputRow input{flex:1!important;min-width:0!important;font-size:14px!important;padding:14px!important;border-radius:11px!important}
+.confirmationInputRow .primary{min-width:190px!important;font-size:13px!important;font-weight:800!important}
+@media(max-width:700px){
+ #founder-core .membershipQuickBuy{padding:17px!important}
+ .stepLabel>span{width:36px;height:36px;font-size:17px}
+ .stepLabel b{font-size:19px!important}
+ .stepLabel small{font-size:11px!important}
+ .quickBuyHead b{font-size:17px!important}
+ .tierButtons{grid-template-columns:1fr 1fr!important}
+ .tierButton{min-height:132px!important;padding:15px!important}
+ .tierButton b{font-size:16px!important}
+ .tierButton strong{font-size:20px!important}
+ .tierButton.selected:after{font-size:7px!important}
+ .quickBuyAction{gap:12px!important}
+ .quickBuyAction>b{font-size:14px!important}
+ .quickBuyAction .primary{width:100%!important}
+ #swap-confirmation .confirmationCard strong{font-size:18px!important}
+ .confirmationInputRow{display:block!important}
+ .confirmationInputRow input{width:100%!important;box-sizing:border-box!important}
+ .confirmationInputRow .primary{width:100%!important;margin-top:9px!important}
+}
+@media(max-width:390px){
+ .tierButtons{grid-template-columns:1fr!important}
+ .tierButton{min-height:112px!important}
+}
