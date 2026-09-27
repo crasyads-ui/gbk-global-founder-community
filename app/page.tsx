@@ -370,7 +370,7 @@ export default function Home() {
         <header className="top">
           <div><div className="crumb">GBK ECOSYSTEM / FOUNDER COMMUNITY</div><h1>Founder Dashboard</h1><p>Coordinate global founders, community growth and ecosystem participation.</p></div>
           <div className="topWallet">
-            <a className="workspaceTopBtn" href="#founder-workspace">👑 Founder Workspace</a>
+            <Link className="workspaceTopBtn" href="/workspace">👑 Founder Workspace</Link>
             {wallet ? <button className="hubBtn" type="button" onClick={disconnectWallet}>✓ {shortWallet}</button> : <button className="primary" type="button" onClick={connectWallet}>🔗 Connect Wallet</button>}
           </div>
         </header>
