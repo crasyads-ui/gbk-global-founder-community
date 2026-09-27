@@ -452,7 +452,8 @@ export default function Home() {
         </section>
 
         <section className="panel swapConfirmationPanel" id="swap-confirmation">
-          <div className="panelHead"><div><h3>🔄 Founder Membership On-Chain Verification</h3><p>Complete the selected membership amount through GBK Swap, then submit the BSC transaction hash.</p></div><span className="badge">LIVE VERIFICATION</span></div>
+          <div className="stepLabel"><span>3</span><div><b>Pay & Verify Your Membership</b><small>Complete the selected amount through GBK Swap, then return here and submit the BSC transaction hash.</small></div></div>
+          <div className="panelHead"><div><h3>🔄 BSC Membership Verification</h3><p>Your connected wallet, selected membership and confirmed transaction are checked before activation.</p></div><span className="badge">LIVE VERIFICATION</span></div>
           <div className="swapFlow">
             <div className="swapStep"><span>1</span><b>Connect Wallet</b><small>Use the same BNB Smart Chain wallet for the membership purchase.</small></div>
             <div className="swapArrow">→</div>
@@ -470,10 +471,11 @@ export default function Home() {
             <div><span>Wallet</span><b>{wallet ? shortWallet : "Connect wallet first"}</b></div>
             <div><span>Holding rule</span><b>Keep ≥ 50% of activation GBK baseline</b></div>
           </div>
+          <div className="verifyBox"><label>BSC transaction hash</label>
           <div className="confirmationInputRow">
-            <input value={txHash} onChange={(e) => setTxHash(e.target.value.trim())} placeholder="0x… BSC transaction hash" aria-label="BSC transaction hash" />
-            <button className="primary" type="button" disabled={!wallet || !selectedTier || !txHash} onClick={verifyFounderTransaction}>Verify Transaction</button>
-          </div>
+            <input value={txHash} onChange={(e) => setTxHash(e.target.value.trim())} placeholder="Paste your 0x… transaction hash" aria-label="BSC transaction hash" />
+            <button className="primary" type="button" disabled={!wallet || !selectedTier || !txHash} onClick={verifyFounderTransaction}>Verify Membership →</button>
+          </div></div>
           <div className="notice"><b>Automatic checks:</b> successful BSC receipt → connected wallet is the transaction sender → selected USDT threshold is met → GBK is received by the same wallet → activation GBK balance is recorded → Founder status is activated. The dashboard then checks the 50% holding rule. No seed phrase or private key is ever requested.</div>
         </section>
 
@@ -560,18 +562,28 @@ export default function Home() {
             <div className="simpleStep"><span>3</span><b>Pay & Verify</b><small>Confirm the transaction. Verification happens in the background.</small></div>
           </div>
           <div className="membershipQuickBuy">
-            <div className="quickBuyHead"><div><b>⚡ Simple Founder Membership</b><small>Referral code is optional. Wallet connection is required before payment.</small></div><span className="badge">SIMPLE FLOW</span></div>
+            <div className="stepLabel"><span>2</span><div><b>Choose Your Founder Membership</b><small>Select one membership level. Your selection will be used for the payment and BSC verification.</small></div></div>
+            <div className="quickBuyHead"><div><b>Founder Membership</b><small>Referral code is optional. Wallet connection is required before payment.</small></div><span className="badge">6 LEVELS</span></div>
             <div className="referralInputRow">
               <input value={referralCode} onChange={(e) => setReferralCode(e.target.value)} placeholder="Referral code (optional)" aria-label="Referral code optional" />
               <span>{referralCode ? "Referral recorded for onboarding" : "No referral code? Continue without it."}</span>
             </div>
-            <div className="tierButtons">
-              {(Object.entries(membershipTiers) as [keyof typeof membershipTiers, typeof membershipTiers[keyof typeof membershipTiers]][]).map(([key,tier]) => (
+            <div className="tierGroup"><div className="tierGroupTitle"><span>🇺🇳</span><div><b>Country Founder</b><small>For country-level community participation</small></div></div>
+            <div className="tierButtons countryTiers">
+              {(Object.entries(membershipTiers).filter(([key]) => key.startsWith("country_")) as [keyof typeof membershipTiers, typeof membershipTiers[keyof typeof membershipTiers]][]).map(([key,tier]) => (
                 <button key={key} type="button" className={selectedTier === key ? "tierButton selected" : "tierButton"} onClick={() => setSelectedTier(key)} disabled={!wallet}>
-                  <b>{tier.title}</b><span>{tier.amount}</span>
+                  <span className="tierScope">{tier.scope}</span><b>{tier.title}</b><strong>{tier.amount}</strong>
                 </button>
               ))}
-            </div>
+            </div></div>
+            <div className="tierGroup"><div className="tierGroupTitle"><span>🌍</span><div><b>Global Founder</b><small>For international and cross-country participation</small></div></div>
+            <div className="tierButtons globalTiers">
+              {(Object.entries(membershipTiers).filter(([key]) => key.startsWith("global_")) as [keyof typeof membershipTiers, typeof membershipTiers[keyof typeof membershipTiers]][]).map(([key,tier]) => (
+                <button key={key} type="button" className={selectedTier === key ? "tierButton selected" : "tierButton"} onClick={() => setSelectedTier(key)} disabled={!wallet}>
+                  <span className="tierScope">{tier.scope}</span><b>{tier.title}</b><strong>{tier.amount}</strong>
+                </button>
+              ))}
+            </div></div>
             <div className="quickBuyAction">
               <b>{!wallet ? "Connect wallet to continue" : selectedTier ? `Selected: ${membershipTiers[selectedTier].title} · ${membershipTiers[selectedTier].amount}` : "Choose a membership level"}</b>
               <button className="primary" type="button" disabled={!wallet || !selectedTier} onClick={() => { if (selectedTier) { setVerificationStatus("GBK Swap route ready — complete the selected amount with Auto Slippage."); window.open(SWAP_URL, "_blank", "noopener,noreferrer"); document.getElementById("swap-confirmation")?.scrollIntoView({ behavior: "smooth" }); } }}>Continue to Payment →</button>
