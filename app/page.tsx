@@ -689,7 +689,7 @@ export default function Home() {
             <input value={businessCategory} onChange={(e) => setBusinessCategory(e.target.value)} placeholder="Category" aria-label="Business category" />
             <input value={businessCountry} onChange={(e) => setBusinessCountry(e.target.value)} placeholder="Country" aria-label="Business country" />
             <input value={businessCity} onChange={(e) => setBusinessCity(e.target.value)} placeholder="City" aria-label="Business city" />
-            <button className="primary" type="button" onClick={searchBusinesses}>{businessLoading ? "Searching…" : "Search Businesses →"}</button>
+            <button className="primary" type="button" onClick={() => void searchBusinesses()}>{businessLoading ? "Searching…" : "Search Businesses →"}</button>
           </div>
           <div className="directoryExamples"><span>Try:</span><button type="button" onClick={() => {setBusinessQuery("AC repair");setBusinessCity("Hyderabad");setBusinessCountry("India");void searchBusinesses({query:"AC repair",city:"Hyderabad",country:"India"});}}>AC repair · Hyderabad</button><button type="button" onClick={() => {setBusinessCategory("Restaurant");void searchBusinesses({category:"Restaurant"});}}>Restaurants</button><button type="button" onClick={() => {setBusinessCategory("Real Estate");void searchBusinesses({category:"Real Estate"});}}>Real Estate</button><button type="button" onClick={() => {setBusinessQuery("website");void searchBusinesses({query:"website"});}}>Website Services</button></div>
           {businessError && <div className="notice"><b>Search:</b> {businessError}</div>}
