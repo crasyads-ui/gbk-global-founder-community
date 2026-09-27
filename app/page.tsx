@@ -318,15 +318,19 @@ export default function Home() {
   const countryName = countryMatch?.[1] || "Country";
   const referralLink = wallet ? `https://app.gbkai.com/?ref=${wallet}` : "";
 
-  async function searchBusinesses() {
+  async function searchBusinesses(overrides: { query?: string; country?: string; city?: string; category?: string } = {}) {
     setBusinessLoading(true);
     setBusinessError("");
     try {
       const params = new URLSearchParams();
-      if (businessQuery.trim()) params.set("q", businessQuery.trim());
-      if (businessCountry.trim()) params.set("country", businessCountry.trim());
-      if (businessCity.trim()) params.set("city", businessCity.trim());
-      if (businessCategory.trim()) params.set("category", businessCategory.trim());
+      const query = overrides.query ?? businessQuery;
+      const country = overrides.country ?? businessCountry;
+      const city = overrides.city ?? businessCity;
+      const category = overrides.category ?? businessCategory;
+      if (query.trim()) params.set("q", query.trim());
+      if (country.trim()) params.set("country", country.trim());
+      if (city.trim()) params.set("city", city.trim());
+      if (category.trim()) params.set("category", category.trim());
       const res = await fetch(`/api/businesses?${params.toString()}`, { cache: "no-store" });
       const data = await res.json().catch(() => ({}));
       if (!res.ok || !data.ok) throw new Error(data.error || "Business search unavailable.");
@@ -664,7 +668,7 @@ export default function Home() {
             <input value={businessCity} onChange={(e) => setBusinessCity(e.target.value)} placeholder="City" aria-label="Business city" />
             <button className="primary" type="button" onClick={searchBusinesses}>{businessLoading ? "Searching…" : "Search Businesses →"}</button>
           </div>
-          <div className="directoryExamples"><span>Try:</span><button type="button" onClick={() => {setBusinessQuery("AC repair");setBusinessCity("Hyderabad");setBusinessCountry("India");void searchBusinesses();}}>AC repair · Hyderabad</button><button type="button" onClick={() => {setBusinessCategory("Restaurant");void searchBusinesses();}}>Restaurants</button><button type="button" onClick={() => {setBusinessCategory("Real Estate");void searchBusinesses();}}>Real Estate</button><button type="button" onClick={() => {setBusinessQuery("website");void searchBusinesses();}}>Website Services</button></div>
+          <div className="directoryExamples"><span>Try:</span><button type="button" onClick={() => {setBusinessQuery("AC repair");setBusinessCity("Hyderabad");setBusinessCountry("India");void searchBusinesses({query:"AC repair",city:"Hyderabad",country:"India"});}}>AC repair · Hyderabad</button><button type="button" onClick={() => {setBusinessCategory("Restaurant");void searchBusinesses({category:"Restaurant"});}}>Restaurants</button><button type="button" onClick={() => {setBusinessCategory("Real Estate");void searchBusinesses({category:"Real Estate"});}}>Real Estate</button><button type="button" onClick={() => {setBusinessQuery("website");void searchBusinesses({query:"website"});}}>Website Services</button></div>
           {businessError && <div className="notice"><b>Search:</b> {businessError}</div>}
           <div className="directoryResults">{businessResults.length ? businessResults.map((business) => (
             <article className="businessResult" key={business.id}>
