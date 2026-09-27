@@ -536,6 +536,28 @@ export default function Home() {
           <div className="notice"><b>Security:</b> Never enter a seed phrase or private key. Only the public wallet address and confirmed BSC transaction hash are used for verification.</div>
         </section>
 
+        <section className="panel founderHub" id="founder-workspace">
+          <div className="panelHead">
+            <div><h3>👑 Founder Workspace</h3><p>Your main workspace for Founder benefits, business activity and GBK ecosystem tools.</p></div>
+            <span className="badge">FOUNDER WORKSPACE</span>
+          </div>
+          <div className="hubGrid">
+            <div className="hubCard"><b>🏠 Founder Home</b><small>Return to your Founder dashboard and membership status.</small><a className="hubBtn" href="#membership-status">Open Dashboard →</a></div>
+            <div className="hubCard"><b>🏪 Business Listings</b><small>Search approved businesses and open the business listing area.</small><a className="hubBtn" href="#business-listings">Open Directory →</a></div>
+            <div className="hubCard"><b>👥 User Opportunities</b><small>Explore current founder, merchant and community opportunities when available.</small><a className="hubBtn" href="#growth-hub">View Opportunities →</a></div>
+            <div className="hubCard"><b>📚 Learn</b><small>Spoken English, multilingual learning and digital skills.</small><a className="hubBtn" href="https://learn.gbkai.com" target="_blank" rel="noreferrer">Open Learn ↗</a></div>
+            <div className="hubCard"><b>📣 Digital Marketing</b><small>Marketing and content resources for founders and businesses.</small><a className="hubBtn" href="https://market.gbkai.com" target="_blank" rel="noreferrer">Open Marketing ↗</a></div>
+            <div className="hubCard"><b>🪙 GBK Loyalty</b><small>Connect with the GBK merchant loyalty ecosystem.</small><a className="hubBtn" href="https://loyalty.gbkai.com" target="_blank" rel="noreferrer">Open Loyalty ↗</a></div>
+            <div className="hubCard"><b>🛠️ AI Tools</b><small>Business, productivity and AI tools across the GBK ecosystem.</small><a className="hubBtn" href="https://tools.gbkai.com" target="_blank" rel="noreferrer">Open AI Tools ↗</a></div>
+            <div className="hubCard"><b>🛒 AI Marketplace</b><small>Explore products, services and everyday needs through the marketplace.</small><a className="hubBtn" href="https://market.gbkai.com" target="_blank" rel="noreferrer">Open Marketplace ↗</a></div>
+            <div className="hubCard"><b>🎟️ Events</b><small>View Founder community events and ecosystem activities.</small><Link className="hubBtn" href="/events">Open Events →</Link></div>
+            <div className="hubCard"><b>📊 My Activity</b><small>Use the Founder tools and activity sections below to review your participation.</small><a className="hubBtn" href="#founder-hub">Open Activity →</a></div>
+            <div className="hubCard"><b>🔗 Social Share</b><small>Share the official GBK ecosystem through your social channels.</small><a className="hubBtn" href="#founder-hub">Open Share Tools →</a></div>
+            <div className="hubCard"><b>🔄 GBK Swap</b><small>Open the supported GBK swap route when you need to buy or use GBK.</small><a className="hubBtn" href="https://swap.gbkai.com" target="_blank" rel="noreferrer">Open GBK Swap ↗</a></div>
+          </div>
+          <div className="notice"><b>Workspace access:</b> this dashboard links to the currently available GBK ecosystem tools. Business listing access, leads and other opportunities remain subject to the applicable program rules and availability.</div>
+        </section>
+
         <section className="panel founderGrowthHub" id="growth-hub">
   <div className="panelHead">
     <div><h3>🚀 Founder Growth Hub</h3><p>Tools, learning and eligible business opportunities included with Founder participation.</p></div>
