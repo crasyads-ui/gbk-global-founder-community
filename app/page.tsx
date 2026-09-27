@@ -83,6 +83,7 @@ export default function Home() {
   const [businessLoading, setBusinessLoading] = useState(false);
   const [businessError, setBusinessError] = useState("");
   const [referralCopied, setReferralCopied] = useState(false);
+  const [workspaceOpen, setWorkspaceOpen] = useState(false);
   const walletConnectProviderRef = useRef<any>(null);
 
   type EthereumProvider = {
@@ -370,7 +371,7 @@ export default function Home() {
         <header className="top">
           <div><div className="crumb">GBK ECOSYSTEM / FOUNDER COMMUNITY</div><h1>Founder Dashboard</h1><p>Coordinate global founders, community growth and ecosystem participation.</p></div>
           <div className="topWallet">
-            <button className="workspaceTopBtn" type="button" onClick={() => document.getElementById("founder-workspace")?.scrollIntoView({ behavior: "smooth", block: "start" })}>👑 Founder Workspace</button>
+            <button className="workspaceTopBtn" type="button" onClick={() => setWorkspaceOpen(true)}>👑 Founder Workspace</button>
             {wallet ? <button className="hubBtn" type="button" onClick={disconnectWallet}>✓ {shortWallet}</button> : <button className="primary" type="button" onClick={connectWallet}>🔗 Connect Wallet</button>}
           </div>
         </header>
@@ -537,10 +538,10 @@ export default function Home() {
           <div className="notice"><b>Security:</b> Never enter a seed phrase or private key. Only the public wallet address and confirmed BSC transaction hash are used for verification.</div>
         </section>
 
-        <section className="panel founderHub" id="founder-workspace">
+        <section className={`panel founderHub ${workspaceOpen ? "workspaceOpen" : ""}`} id="founder-workspace">
           <div className="panelHead">
             <div><h3>👑 Founder Workspace</h3><p>Your main workspace for Founder benefits, business activity and GBK ecosystem tools.</p></div>
-            <span className="badge">FOUNDER WORKSPACE</span>
+            <div className="workspaceHeadActions"><span className="badge">FOUNDER WORKSPACE</span><button className="hubBtn workspaceClose" type="button" onClick={() => setWorkspaceOpen(false)}>✕ Close</button></div>
           </div>
           <div className="hubGrid">
             <div className="hubCard"><b>🏠 Founder Home</b><small>Return to your Founder dashboard and membership status.</small><a className="hubBtn" href="#membership-status">Open Dashboard →</a></div>
