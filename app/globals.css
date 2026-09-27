@@ -214,3 +214,27 @@ body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,
 }
 
 .countrySelect{width:100%;margin:12px 0;padding:13px 14px;border:1px solid #dfe4ee;border-radius:14px;background:#fff;color:#18254a;font:inherit;font-weight:600;box-sizing:border-box}.countrySelect:focus{outline:2px solid rgba(83,70,229,.2);border-color:#6b5ce7}
+
+.businessDirectory{margin-top:22px}
+.directorySearch{display:grid;grid-template-columns:2fr 1fr 1fr 1fr auto;gap:10px;margin-top:18px}
+.directorySearch input{min-width:0;padding:14px;border:1px solid #dfe4ee;border-radius:14px;background:#fff;color:#18254a;font:inherit}
+.directoryExamples{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:12px 0}
+.directoryExamples span{font-size:13px;color:#69758d}
+.directoryExamples button{border:1px solid #e2e6ef;background:#fff;border-radius:999px;padding:8px 11px;color:#26345a;font-weight:600}
+.directoryResults{display:grid;gap:10px;margin-top:14px}
+.businessResult{display:flex;gap:14px;padding:16px;border:1px solid #e4e8f0;border-radius:18px;background:#fff}
+.businessLogo{width:52px;height:52px;flex:0 0 52px;border-radius:14px;background:#f1f4fb;display:grid;place-items:center;overflow:hidden;font-size:24px}
+.businessLogo img{width:100%;height:100%;object-fit:cover}
+.businessResult>div:nth-child(2){min-width:0;display:grid;gap:5px}
+.businessResult b{font-size:17px;color:#17244b}
+.businessResult span{font-size:13px;color:#68758d}
+.businessResult small{color:#657189;line-height:1.45}
+.businessLinks{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.businessLinks a{font-weight:700;color:#315eea;text-decoration:none}
+.businessLinks em{font-style:normal;font-size:12px;font-weight:700;color:#198754}
+.directoryEmpty{padding:24px;border:1px dashed #d6dce8;border-radius:18px;display:grid;gap:5px;text-align:center;color:#68758d}
+.directoryEmpty b{color:#1b2850;font-size:17px}
+.directoryFooter{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:16px}
+.directoryFooter small{max-width:560px;color:#758097;line-height:1.45}
+@media(max-width:900px){.directorySearch{grid-template-columns:1fr 1fr}.directorySearch input:first-child{grid-column:1/-1}.directorySearch .primary{grid-column:1/-1;width:100%}.directoryFooter{align-items:stretch;flex-direction:column}.directoryFooter .primary{width:100%;text-align:center;box-sizing:border-box}}
+@media(max-width:520px){.directorySearch{grid-template-columns:1fr}.directorySearch input:first-child{grid-column:auto}.businessResult{padding:13px}.businessLogo{width:44px;height:44px;flex-basis:44px}.directoryExamples{overflow:hidden}}
