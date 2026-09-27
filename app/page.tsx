@@ -28,6 +28,7 @@ const stats = [
 ];
 
 const countries = [["🇮🇳","India","184"],["🇦🇪","UAE","96"],["🇺🇸","USA","74"],["🇧🇷","Brazil","61"],["🇻🇳","Vietnam","48"]];
+const countryOptions = [["🇮🇳","India"],["🇦🇪","UAE"],["🇺🇸","USA"],["🇧🇷","Brazil"],["🇻🇳","Vietnam"],["🇬🇧","United Kingdom"],["🇨🇦","Canada"],["🇦🇺","Australia"],["🇸🇬","Singapore"],["🇲🇾","Malaysia"],["🇮🇩","Indonesia"],["🇹🇭","Thailand"],["🇵🇭","Philippines"],["🇩🇪","Germany"],["🇫🇷","France"],["🇯🇵","Japan"],["🇰🇷","South Korea"],["🇿🇦","South Africa"],["🇳🇬","Nigeria"],["🇰🇪","Kenya"],["🇲🇽","Mexico"],["🇳🇱","Netherlands"],["🇮🇹","Italy"],["🇪🇸","Spain"],["🇧🇩","Bangladesh"],["🇵🇰","Pakistan"],["🇱🇰","Sri Lanka"],["🇳🇵","Nepal"],["🇸🇦","Saudi Arabia"],["🇶🇦","Qatar"]] as const;
 const membershipTiers = {
   country_300: { scope: "Country", amount: "$300", badge: "COUNTRY FOUNDER", title: "Country Founder", benefits: ["Country founder networking","Local community participation","Approved founder marketing resources","Merchant and ecosystem connections"] },
   country_500: { scope: "Country", amount: "$500", badge: "COUNTRY GROWTH FOUNDER", title: "Country Growth Founder", benefits: ["Country founder networking","Community growth participation","Approved founder marketing resources","Merchant and ecosystem connections","Eligible country events"] },
@@ -67,6 +68,7 @@ export default function Home() {
   const [wallet, setWallet] = useState("");
   const [walletStatus, setWalletStatus] = useState("Not connected");
   const [profileSaved, setProfileSaved] = useState(false);
+  const [selectedCountry, setSelectedCountry] = useState("");
   const [membershipRecord, setMembershipRecord] = useState<any>(null);
   const [referralCode, setReferralCode] = useState("");
   const [selectedTier, setSelectedTier] = useState<keyof typeof membershipTiers | null>(null);
@@ -84,6 +86,8 @@ export default function Home() {
 
   useEffect(() => {
     const ethereum = (window as Window & { ethereum?: EthereumProvider }).ethereum;
+    const savedCountry = window.localStorage.getItem("gbkFounderCountry");
+    if (savedCountry) setSelectedCountry(savedCountry);
     const saved = window.localStorage.getItem("gbkFounderWallet");
     if (saved) {
       setWallet(saved);
@@ -302,6 +306,9 @@ export default function Home() {
   }
 
   const shortWallet = wallet ? `${wallet.slice(0, 6)}…${wallet.slice(-4)}` : "";
+  const countryMatch = countryOptions.find(([, name]) => name === selectedCountry);
+  const countryFlag = countryMatch?.[0] || "🏳️";
+  const countryName = countryMatch?.[1] || "Country";
   const referralLink = wallet ? `https://app.gbkai.com/?ref=${wallet}` : "";
 
   async function copyReferralLink() {
@@ -488,7 +495,7 @@ export default function Home() {
             const tier = membershipTiers[membershipRecord.tier_code as keyof typeof membershipTiers];
             const holdingActive = membershipRecord.holding_status === "active";
             return <div className="membershipDashboard">
-              <div className="membershipIdentity"><span className="membershipBadge">🏅 {tier?.badge || "FOUNDER"}</span><strong>{tier?.title || membershipRecord.tier_code}</strong><small>{tier?.scope || "Founder"} · ${membershipRecord.price_usd}</small></div>
+              <div className="membershipIdentity"><span className="membershipBadge">{tier?.scope === "Country" ? countryFlag : "🌍"} {tier?.badge || "FOUNDER"}</span><strong>{tier?.title || membershipRecord.tier_code}</strong><small>{tier?.scope === "Country" ? `${countryName} · ${membershipRecord.price_usd}` : `Global · ${membershipRecord.price_usd}`}</small></div>
               <div className="membershipMeta"><div><span>Scope</span><b>{tier?.scope || "Founder"}</b></div><div><span>Verified Amount</span><b>${membershipRecord.price_usd}</b></div><div><span>GBK Baseline</span><b>{Number(membershipRecord.baseline_gbk_balance).toLocaleString()} GBK</b></div><div><span>Minimum Holding</span><b>{Number(membershipRecord.minimum_gbk_balance).toLocaleString()} GBK</b></div></div>
               <div className="membershipBenefits"><b>{holdingActive ? "Founder benefits active ✓" : "Founder benefits paused"}</b><span>Current GBK: {Number(membershipRecord.current_gbk_balance).toLocaleString()} GBK</span><span>Required: at least 50% of activation baseline</span>{(tier?.benefits || []).map(x=><span key={x}>{holdingActive ? "✓" : "⏸"} {x}</span>)}</div>
               <div className="notice"><b>50% holding rule:</b> activation baseline = {Number(membershipRecord.baseline_gbk_balance).toLocaleString()} GBK; minimum = {Number(membershipRecord.minimum_gbk_balance).toLocaleString()} GBK. Below the minimum, Founder benefits are paused; returning to the minimum reactivates them.</div>
@@ -591,7 +598,7 @@ export default function Home() {
           </div>
           <div className="coreGrid">
             <div className="coreCard"><b>1. Connect / Sign In</b><small>Connect your supported wallet to identify your Founder dashboard session.</small><button className="hubBtn" type="button" onClick={connectWallet}>{wallet ? "Wallet Connected ✓" : "Connect Wallet"}</button></div>
-            <div className="coreCard"><b>2. Complete Profile</b><small>Name, country, city, preferred language, social links and founder focus.</small><button className="hubBtn" type="button" onClick={() => setProfileSaved(true)}>{profileSaved ? "Profile Saved ✓" : "Profile Setup"}</button></div>
+            <div className="coreCard"><b>2. Complete Profile</b><small>Select your country so your Country Founder membership shows the correct flag and country name.</small><select value={selectedCountry} onChange={(e) => setSelectedCountry(e.target.value)} aria-label="Founder country"><option value="">Select country</option>{countryOptions.map(([flag,name]) => <option key={name} value={name}>{flag} {name}</option>)}</select><button className="hubBtn" type="button" onClick={() => { if (selectedCountry) { window.localStorage.setItem("gbkFounderCountry", selectedCountry); setProfileSaved(true); } }}>{profileSaved ? "Profile Saved ✓" : "Save Country"}</button></div>
             <div className="coreCard"><b>3. Membership</b><small>Country Founder: $300 / $500 / $1,000 · Global Founder: $3,000 / $5,000 / $10,000.</small><a href="#programs">View Programs →</a></div>
             <div className="coreCard"><b>4. Verification</b><small>Membership and founder status must be verified before badges or restricted benefits are activated.</small><span className="statusPill">VERIFICATION READY</span></div>
           </div>
