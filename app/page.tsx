@@ -495,7 +495,33 @@ export default function Home() {
           <div className="notice"><b>Security:</b> Never enter a seed phrase or private key. Only the public wallet address and confirmed BSC transaction hash are used for verification.</div>
         </section>
 
-        <section className="panel founderCore" id="founder-core">
+        <section className="panel founderGrowthHub" id="growth-hub">
+  <div className="panelHead">
+    <div><h3>🚀 Founder Growth Hub</h3><p>Tools, learning and eligible business opportunities included with Founder participation.</p></div>
+    <span className="badge">FOUNDER BENEFITS</span>
+  </div>
+  <div className="growthIntro">
+    <b>Build skills. Find leads. Grow your business.</b>
+    <span>Founder benefits and lead opportunities vary by membership level and current program availability. Revenue is not guaranteed.</span>
+  </div>
+  <div className="growthTools">
+    <a href="https://tools.gbkai.com" target="_blank" rel="noreferrer"><b>🛠️ AI & Business Tools</b><small>AI productivity, business, content and everyday digital tools.</small><strong>Open Tools →</strong></a>
+    <a href="https://learn.gbkai.com" target="_blank" rel="noreferrer"><b>🌍 Learn Languages</b><small>Spoken English, multilingual learning, pronunciation and digital skills.</small><strong>Start Learning →</strong></a>
+    <a href="https://market.gbkai.com" target="_blank" rel="noreferrer"><b>📣 Digital Marketing</b><small>Content, promotion and digital marketing resources for founders and businesses.</small><strong>Explore →</strong></a>
+  </div>
+  <div className="leadTitle"><b>Founder Leads & Business Opportunities</b><small>Membership level determines the applicable access, priority and campaign participation.</small></div>
+  <div className="leadGrid">
+    <div><span>COUNTRY</span><b>$300</b><small>Starter founder tools, learning access and eligible local lead opportunities.</small></div>
+    <div><span>COUNTRY</span><b>$500</b><small>Expanded tools, learning resources and eligible local campaign/lead opportunities.</small></div>
+    <div><span>COUNTRY</span><b>$1,000</b><small>Advanced founder resources and eligible higher-priority country opportunities.</small></div>
+    <div><span>GLOBAL</span><b>$3,000</b><small>Global tools, learning and eligible cross-country lead opportunities.</small></div>
+    <div><span>GLOBAL</span><b>$5,000</b><small>Expanded global campaigns, tools and eligible business lead opportunities.</small></div>
+    <div><span>GLOBAL</span><b>$10,000</b><small>Highest Founder program access, global campaigns and eligible priority opportunities.</small></div>
+  </div>
+  <div className="notice"><b>Important:</b> Leads and business opportunities depend on actual users, merchants, campaigns and program availability. Founder membership does not guarantee customers, sales, profit or revenue.</div>
+</section>
+
+<section className="panel founderCore" id="founder-core">
           <div className="panelHead"><div><h3>👤 Founder Core</h3><p>Connect your wallet and prepare your founder profile.</p></div><span className={`statusPill ${wallet ? "connected" : ""}`}>{wallet ? "WALLET CONNECTED" : "NOT CONNECTED"}</span></div>
           <div className="walletConnectBox">
             <div><b>{wallet ? `Connected: ${shortWallet}` : "Connect your BNB Smart Chain wallet"}</b><small>{wallet ? "Wallet connected. Founder membership still requires separate verification." : "Connect from a wallet app or from any normal browser using the secure WalletConnect selector. BNB Smart Chain is required."}</small></div>
