@@ -493,7 +493,7 @@ export default function Home() {
               <div className="membershipBenefits"><b>{holdingActive ? "Founder benefits active ✓" : "Founder benefits paused"}</b><span>Current GBK: {Number(membershipRecord.current_gbk_balance).toLocaleString()} GBK</span><span>Required: at least 50% of activation baseline</span>{(tier?.benefits || []).map(x=><span key={x}>{holdingActive ? "✓" : "⏸"} {x}</span>)}</div>
               <div className="notice"><b>50% holding rule:</b> activation baseline = {Number(membershipRecord.baseline_gbk_balance).toLocaleString()} GBK; minimum = {Number(membershipRecord.minimum_gbk_balance).toLocaleString()} GBK. Below the minimum, Founder benefits are paused; returning to the minimum reactivates them.</div>
             </div>;
-          })() : <div className="membershipPending"><strong>Connect wallet → choose membership → complete qualifying GBK purchase → verify transaction</strong><span>The backend verifies the BSC transaction and records the original GBK balance at activation. Referral code is optional.</span><div className="tierPreview">{Object.values(membershipTiers).map(t=><div key={t.amount+t.title}><b>{t.title}</b><small>{t.scope} · {t.amount}</small></div>)}</div></div>}
+          })() : <div className="membershipPending"><strong>Connect wallet → choose membership → complete qualifying GBK purchase → verify transaction</strong><span>The backend verifies the BSC transaction and records the original GBK balance at activation. A referral is not required for the Founder membership purchase.</span><div className="tierPreview">{Object.values(membershipTiers).map(t=><div key={t.amount+t.title}><b>{t.title}</b><small>{t.scope} · {t.amount}</small></div>)}</div></div>}
           <div className="notice"><b>Security:</b> Never enter a seed phrase or private key. Only the public wallet address and confirmed BSC transaction hash are used for verification.</div>
         </section>
 
@@ -536,8 +536,8 @@ export default function Home() {
               <div className="earnReferralBox">
                 <div>
                   <span className="earnBadge">WALLET CONNECTED</span>
-                  <b>💰 L1 / L2 Earn & Referral</b>
-                  <small>Use the same connected wallet on GBK Swap for the swap, then use the GBK Earn dashboard for referral activity and reward status.</small>
+                  <b>💰 L1 / L2 Referral Rewards</b>
+                  <small>Founder membership purchases use GBK Swap without a referral. L1/L2 referral rewards are available separately through app.gbkai.com.</small>
                   <div className="earnLevels"><span><strong>L1</strong> 6%</span><span><strong>L2</strong> 2%</span></div>
                 </div>
                 <div className="earnActions">
@@ -563,10 +563,10 @@ export default function Home() {
           </div>
           <div className="membershipQuickBuy">
             <div className="stepLabel"><span>2</span><div><b>Choose Your Founder Membership</b><small>Select one membership level. Your selection will be used for the payment and BSC verification.</small></div></div>
-            <div className="quickBuyHead"><div><b>Founder Membership</b><small>Referral code is optional. Wallet connection is required before payment.</small></div><span className="badge">6 LEVELS</span></div>
+            <div className="quickBuyHead"><div><b>Founder Membership</b><small>Referral code is not required for Founder membership. Use GBK Swap for the membership purchase.</small></div><span className="badge">6 LEVELS</span></div>
             <div className="referralInputRow">
               <input value={referralCode} onChange={(e) => setReferralCode(e.target.value)} placeholder="Referral code (optional)" aria-label="Referral code optional" />
-              <span>{referralCode ? "Referral recorded for onboarding" : "No referral code? Continue without it."}</span>
+              <span>{referralCode ? "Referral recorded for onboarding" : "No referral is required. Continue directly to GBK Swap."}</span>
             </div>
             <div className="tierGroup"><div className="tierGroupTitle"><span>🇺🇳</span><div><b>Country Founder</b><small>For country-level community participation</small></div></div>
             <div className="tierButtons countryTiers">
