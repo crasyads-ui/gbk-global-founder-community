@@ -75,6 +75,13 @@ export default function Home() {
   const [txHash, setTxHash] = useState("");
   const [verificationStatus, setVerificationStatus] = useState("Not submitted");
   const [membershipLoading, setMembershipLoading] = useState(false);
+  const [businessQuery, setBusinessQuery] = useState("");
+  const [businessCountry, setBusinessCountry] = useState("");
+  const [businessCity, setBusinessCity] = useState("");
+  const [businessCategory, setBusinessCategory] = useState("");
+  const [businessResults, setBusinessResults] = useState<any[]>([]);
+  const [businessLoading, setBusinessLoading] = useState(false);
+  const [businessError, setBusinessError] = useState("");
   const [referralCopied, setReferralCopied] = useState(false);
   const walletConnectProviderRef = useRef<any>(null);
 
@@ -310,6 +317,27 @@ export default function Home() {
   const countryFlag = countryMatch?.[0] || "🏳️";
   const countryName = countryMatch?.[1] || "Country";
   const referralLink = wallet ? `https://app.gbkai.com/?ref=${wallet}` : "";
+
+  async function searchBusinesses() {
+    setBusinessLoading(true);
+    setBusinessError("");
+    try {
+      const params = new URLSearchParams();
+      if (businessQuery.trim()) params.set("q", businessQuery.trim());
+      if (businessCountry.trim()) params.set("country", businessCountry.trim());
+      if (businessCity.trim()) params.set("city", businessCity.trim());
+      if (businessCategory.trim()) params.set("category", businessCategory.trim());
+      const res = await fetch(`/api/businesses?${params.toString()}`, { cache: "no-store" });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.ok) throw new Error(data.error || "Business search unavailable.");
+      setBusinessResults(data.businesses || []);
+    } catch (error) {
+      setBusinessError(error instanceof Error ? error.message : "Business search unavailable.");
+      setBusinessResults([]);
+    } finally {
+      setBusinessLoading(false);
+    }
+  }
 
   async function copyReferralLink() {
     if (!referralLink) return;
@@ -626,6 +654,26 @@ export default function Home() {
         <section className="panel founderHub" id="founder-hub"><div className="panelHead"><div><h3>🚀 Founder Workspace</h3><p>Share GBK content, invite genuine community members and track your campaign activity.</p></div><span className="badge">FOUNDER TOOLS</span></div><div className="hubGrid"><div className="hubCard"><b>🔗 Your GBK Share Link</b><small>Use the official ecosystem entry point when sharing. Copy it once, then post through your own social accounts.</small><button className="hubBtn" onClick={() => navigator.clipboard?.writeText("https://app.gbkai.com")}>Copy GBK Link</button></div><div className="hubCard"><b>📣 Social Share</b><small>Share the GBK ecosystem through supported social platforms. Review content before posting.</small><div className="shareRow"><a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fapp.gbkai.com" target="_blank" rel="noreferrer">Facebook</a><a href="https://twitter.com/intent/tweet?url=https%3A%2F%2Fapp.gbkai.com&text=Explore%20the%20GBK%20ecosystem" target="_blank" rel="noreferrer">X</a><a href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fapp.gbkai.com" target="_blank" rel="noreferrer">LinkedIn</a><a href="https://wa.me/?text=Explore%20the%20GBK%20ecosystem%20https%3A%2F%2Fapp.gbkai.com" target="_blank" rel="noreferrer">WhatsApp</a></div></div><div className="hubCard"><b>🎬 Short Video Hub</b><small>Ready-to-share topics: What is GBK? · How GBK Swap works · Buy & Hold · AI Marketplace · Learn · Agri.</small><Link className="hubBtn" href="/tools">Open Content Studio →</Link></div><div className="hubCard"><b>📊 Founder Analytics</b><small>Track content reach, website visits, wallet connections, successful swaps and returning users once live analytics is connected.</small><Link className="hubBtn" href="/tools">Open Analytics →</Link></div></div></section>
 
         <section className="panel referralPanel" id="referrals"><div className="panelHead"><div><h3>🔗 Referral Benefits · app.gbkai.com</h3><p>Referral program participation through the GBK ecosystem.</p></div><span className="badge">L1 + L2</span></div><div className="refGrid"><div className="refCard"><span>L1</span><strong>6%</strong><p>Direct referral reward</p><small>Eligible activity only</small></div><div className="refCard"><span>L2</span><strong>2%</strong><p>Second-level referral reward</p><small>Eligible activity only</small></div><div className="refFlow"><b>Connect Wallet</b><i>→</i><b>Get Referral Link</b><i>→</i><b>Invite Genuine Users</b><i>→</i><b>Eligible Swap</b><i>→</i><b>Reward Recorded</b></div></div><div className="notice">Referral rewards are subject to app.gbkai.com program rules, eligibility, completed qualifying transactions and applicable terms. No guaranteed income. No self-referrals, duplicate/fake accounts or spam.</div><div className="refActions"><a href={SWAP_URL} target="_blank" rel="noreferrer">Open GBK Swap ↗</a><a href={EARN_URL} target="_blank" rel="noreferrer">Open Earn ↗</a></div></section>
+
+        <section className="panel businessDirectory" id="business-listings">
+          <div className="panelHead"><div><h3>🔎 Global Business Directory</h3><p>Search approved GBK business listings by name, service, category, country or city.</p></div><span className="badge">SEARCH</span></div>
+          <div className="directorySearch">
+            <input value={businessQuery} onChange={(e) => setBusinessQuery(e.target.value)} placeholder="Search business, service or product" aria-label="Search business" />
+            <input value={businessCategory} onChange={(e) => setBusinessCategory(e.target.value)} placeholder="Category" aria-label="Business category" />
+            <input value={businessCountry} onChange={(e) => setBusinessCountry(e.target.value)} placeholder="Country" aria-label="Business country" />
+            <input value={businessCity} onChange={(e) => setBusinessCity(e.target.value)} placeholder="City" aria-label="Business city" />
+            <button className="primary" type="button" onClick={searchBusinesses}>{businessLoading ? "Searching…" : "Search Businesses →"}</button>
+          </div>
+          <div className="directoryExamples"><span>Try:</span><button type="button" onClick={() => {setBusinessQuery("AC repair");setBusinessCity("Hyderabad");setBusinessCountry("India");void searchBusinesses();}}>AC repair · Hyderabad</button><button type="button" onClick={() => {setBusinessCategory("Restaurant");void searchBusinesses();}}>Restaurants</button><button type="button" onClick={() => {setBusinessCategory("Real Estate");void searchBusinesses();}}>Real Estate</button><button type="button" onClick={() => {setBusinessQuery("website");void searchBusinesses();}}>Website Services</button></div>
+          {businessError && <div className="notice"><b>Search:</b> {businessError}</div>}
+          <div className="directoryResults">{businessResults.length ? businessResults.map((business) => (
+            <article className="businessResult" key={business.id}>
+              <div className="businessLogo">{business.logo_url ? <img src={business.logo_url} alt="" /> : "🏪"}</div>
+              <div><b>{business.business_name}</b><span>{business.category || "Business"} · {[business.city,business.country].filter(Boolean).join(", ")}</span><small>{business.description || "Approved GBK business listing."}</small><div className="businessLinks">{business.website && <a href={business.website} target="_blank" rel="noreferrer">Website ↗</a>}{business.phone && <a href={`tel:${business.phone}`}>Contact</a>}{business.loyalty_status === "ACTIVE" && <em>🪙 GBK Loyalty</em>}</div></div>
+            </article>
+          )) : <div className="directoryEmpty"><b>Search the GBK business network</b><span>Only approved ACTIVE listings are shown here.</span></div>}</div>
+          <div className="directoryFooter"><a className="primary" href="https://loyalty.gbkai.com" target="_blank" rel="noreferrer">🏪 Add / Manage Business ↗</a><small>Business submissions are reviewed before becoming searchable. Listing access does not guarantee customers, sales or revenue.</small></div>
+        </section>
 
         <section className="panel anchorPanel" id="merchants"><h3>🏪 Merchant Ecosystem</h3><p>Connect with participating merchants and explore GBK marketplace opportunities.</p></section>
         <section className="panel anchorPanel" id="marketplace"><h3>✦ AI Marketplace</h3><p>Explore the GBK AI “Ask for Anything” marketplace for products, services and everyday needs.</p><a href="https://market.gbkai.com" target="_blank" rel="noreferrer">Open Marketplace ↗</a></section>
