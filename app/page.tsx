@@ -564,6 +564,45 @@ export default function Home() {
 
         
 
+        <section className="panel founderNetworkPanel" id="founder-referral-network">
+          <div className="panelHead">
+            <div><h3>👥 Founder Referral Network</h3><p>Manage your Founder-linked users and businesses through GBK Loyalty.</p></div>
+            <span className="badge">NETWORK</span>
+          </div>
+          <div className="founderNetworkHero">
+            <div>
+              <span>YOUR FOUNDER BUSINESS REFERRAL CODE</span>
+              <strong>{founderReferralCode || (wallet ? "Available after Founder verification" : "Connect and verify your Founder wallet")}</strong>
+              <small>Share this code with a business owner. Founder attribution is created only when the business uses your valid code.</small>
+            </div>
+            <button className="hubBtn" type="button" disabled={!founderReferralCode} onClick={async () => {
+              if (!founderReferralCode) return;
+              try { await navigator.clipboard.writeText(founderReferralCode); setReferralCopied(true); window.setTimeout(() => setReferralCopied(false), 1800); } catch {}
+            }}>{referralCopied ? "✓ Copied" : "Copy Code"}</button>
+          </div>
+          <div className="founderNetworkGrid">
+            <div className="founderNetworkCard">
+              <div className="founderNetworkIcon">👤</div>
+              <div><b>My User Referrals</b><small>Invite users and manage Founder-linked user opportunities through GBK Loyalty.</small></div>
+              <a className="hubBtn" href="https://loyalty.gbkai.com" target="_blank" rel="noreferrer">Open User Network ↗</a>
+            </div>
+            <div className="founderNetworkCard">
+              <div className="founderNetworkIcon">🏢</div>
+              <div><b>My Business Referrals</b><small>Add businesses or share your Founder code. Businesses may also register directly without a Founder.</small></div>
+              <a className="hubBtn" href="https://loyalty.gbkai.com" target="_blank" rel="noreferrer">Open Business Network ↗</a>
+            </div>
+            <div className="founderNetworkCard">
+              <div className="founderNetworkIcon">🪙</div>
+              <div><b>Loyalty Reward Connection</b><small>For qualifying orders from a business linked to you, the current program allocates 20% of the loyalty reward pool to the Founder.</small></div>
+              <a className="hubBtn" href="https://loyalty.gbkai.com" target="_blank" rel="noreferrer">Open Loyalty ↗</a>
+            </div>
+          </div>
+          <div className="founderNetworkFlow">
+            <span>FOUNDER</span><i>→</i><span>USER / BUSINESS</span><i>→</i><span>GBK LOYALTY</span><i>→</i><span>QUALIFYING ACTIVITY</span>
+          </div>
+          <div className="notice"><b>Referral rules:</b> Founder membership does not require a referral. Business registration is open to everyone. A valid Founder code is optional and creates Founder attribution only when the business uses that code. Country Founder referrals remain subject to country rules.</div>
+        </section>
+
         <section className="panel founderBenefits" id="founder-benefits">
           <div className="panelHead">
             <div><h3>👑 Founder Benefits — 3 Core Benefits</h3><p>Holding rewards, Founder referrals, and Business Loyalty participation.</p></div>
