@@ -157,7 +157,7 @@ export default function Home() {
       void refreshMembershipStatus(wallet);
       void syncLoyaltyNetwork(wallet);
     }
-  }, [wallet]);
+  }, [wallet, selectedCountry]);
 
   async function ensureBscNetwork(provider: EthereumProvider) {
     try {
