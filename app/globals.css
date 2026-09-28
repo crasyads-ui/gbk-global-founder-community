@@ -286,3 +286,23 @@ body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,
 .benefitExample p{margin:8px 0 0;font-size:10px;line-height:1.55;color:#64748b}
 @media(max-width:900px){.benefitGrid{grid-template-columns:1fr 1fr}}
 @media(max-width:600px){.benefitGrid{grid-template-columns:1fr}.benefitCard{padding:16px}.benefitExample div{display:block}.benefitExample span{display:block;margin-top:4px}}
+
+/* Founder Referral Network */
+#founder-referral-network{margin-top:16px!important;background:linear-gradient(180deg,#fff 0%,#fbfdff 100%)!important;border:1px solid #dbe4f0!important;border-radius:22px!important;box-shadow:0 12px 35px rgba(15,23,42,.06)!important}
+#founder-referral-network .panelHead{border-bottom:1px solid #eef2f7!important;padding-bottom:14px!important}
+#founder-referral-network .panelHead h3{font-size:20px!important;color:#172554!important}
+.founderNetworkHero{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:16px;border:1px solid #dbeafe;border-radius:16px;background:linear-gradient(135deg,#eff6ff,#f5f3ff)}
+.founderNetworkHero span{display:block;font-size:9px;letter-spacing:1px;color:#64748b}
+.founderNetworkHero strong{display:block;margin-top:6px;font-size:18px;letter-spacing:1px;color:#172554;word-break:break-all}
+.founderNetworkHero small{display:block;margin-top:6px;color:#64748b;font-size:10px;line-height:1.5}
+.founderNetworkHero .hubBtn{margin-top:0;white-space:nowrap}
+.founderNetworkGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:13px}
+.founderNetworkCard{display:flex;flex-direction:column;gap:9px;padding:16px;border:1px solid #e2e8f0;border-radius:16px;background:#fff}
+.founderNetworkIcon{width:40px;height:40px;display:grid;place-items:center;border-radius:12px;background:#eff6ff;font-size:19px}
+.founderNetworkCard b{font-size:15px;color:#172554}
+.founderNetworkCard small{display:block;margin-top:5px;color:#64748b;font-size:10px;line-height:1.5;flex:1}
+.founderNetworkCard .hubBtn{align-self:flex-start;margin-top:auto}
+.founderNetworkFlow{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:13px;padding:12px;border:1px dashed #cbd5e1;border-radius:13px;color:#64748b;font-size:9px;letter-spacing:.5px}
+.founderNetworkFlow i{font-style:normal;color:#2563eb}
+@media(max-width:800px){.founderNetworkGrid{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.founderNetworkHero{display:block}.founderNetworkHero .hubBtn{width:100%;margin-top:11px;text-align:center}.founderNetworkGrid{grid-template-columns:1fr}.founderNetworkCard .hubBtn{width:100%;text-align:center}.founderNetworkFlow{justify-content:flex-start}}
