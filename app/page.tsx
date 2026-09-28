@@ -5,6 +5,10 @@ import { useEffect, useRef, useState } from "react";
 
 const SWAP_URL = "https://swap.gbkai.com";
 const EARN_URL = "https://app.gbkai.com/#earn";
+const SUPABASE_URL = "https://yjwgnapymqetxvksqacd.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_Y3n5bVO3xveBnyt4LKbCPg_f5ilMSuz";
+const LOYALTY_API_URL = `${SUPABASE_URL}/functions/v1/loyalty-api`;
+const loyaltyBusinessCategories = ["Hotels & Resorts","Restaurants & Cafés","Stores & Supermarkets","Groceries & Supermarkets","Fashion & Apparel","Electronics","Pharmacies & Health Stores","Salons & Beauty","AC Repair","Plumbing & Electrical","Home Services","Automotive & EV","Travel Agencies","Flights & Holidays","Taxis & Transport","Parcel & Logistics","Education & Courses","Spoken English","Healthcare & Clinics","Real Estate","Agriculture & Farm Services","IT & Web Development","Digital Marketing","Events & Weddings","Fitness & Sports","Professional Services","Local Shops","Wholesale & Distribution","Manufacturing","Construction","Cleaning Services","Pet Services"];
 
 const nav = [
   ["Overview", "/", "⌂"],
@@ -84,6 +88,23 @@ export default function Home() {
   const [businessLoading, setBusinessLoading] = useState(false);
   const [businessError, setBusinessError] = useState("");
   const [referralCopied, setReferralCopied] = useState(false);
+  const [loyaltyAccessToken, setLoyaltyAccessToken] = useState("");
+  const [loyaltyConnected, setLoyaltyConnected] = useState(false);
+  const [loyaltySyncStatus, setLoyaltySyncStatus] = useState("Not connected to GBK Loyalty");
+  const [founderNetwork, setFounderNetwork] = useState<{users:any[];businesses:any[]}>({users:[],businesses:[]});
+  const [founderUserName, setFounderUserName] = useState("");
+  const [founderUserContact, setFounderUserContact] = useState("");
+  const [founderUserCountry, setFounderUserCountry] = useState("");
+  const [founderBusinessName, setFounderBusinessName] = useState("");
+  const [founderBusinessOwner, setFounderBusinessOwner] = useState("");
+  const [founderBusinessContact, setFounderBusinessContact] = useState("");
+  const [founderBusinessCity, setFounderBusinessCity] = useState("");
+  const [founderBusinessCountry, setFounderBusinessCountry] = useState("");
+  const [founderBusinessCategory, setFounderBusinessCategory] = useState("Restaurants & Cafés");
+  const [founderBusinessOffer, setFounderBusinessOffer] = useState("10%");
+  const [founderBusinessAddress, setFounderBusinessAddress] = useState("");
+  const [founderBusinessWebsite, setFounderBusinessWebsite] = useState("");
+  const [networkBusy, setNetworkBusy] = useState(false);
   const walletConnectProviderRef = useRef<any>(null);
 
   type EthereumProvider = {
@@ -132,7 +153,10 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    if (wallet) void refreshMembershipStatus(wallet);
+    if (wallet) {
+      void refreshMembershipStatus(wallet);
+      void syncLoyaltyNetwork(wallet);
+    }
   }, [wallet]);
 
   async function ensureBscNetwork(provider: EthereumProvider) {
@@ -265,6 +289,134 @@ export default function Home() {
     const data = await res.json().catch(() => ({}));
     if (!res.ok || data?.ok === false) throw new Error(data?.error || "Founder verification request failed");
     return data;
+  }
+
+  async function loyaltyRequest(token:string, action:string, body:Record<string, unknown> = {}) {
+    const res = await fetch(LOYALTY_API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "apikey": SUPABASE_PUBLISHABLE_KEY,
+        "Authorization": `Bearer ${token}`,
+      },
+      body: JSON.stringify({ action, ...body }),
+      cache: "no-store",
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || data?.error) throw new Error(data?.error || "GBK Loyalty request failed");
+    return data;
+  }
+
+  async function createLoyaltyAnonymousSession() {
+    const res = await fetch(`${SUPABASE_URL}/auth/v1/signup`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "apikey": SUPABASE_PUBLISHABLE_KEY,
+      },
+      body: JSON.stringify({}),
+      cache: "no-store",
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || !data?.access_token) throw new Error(data?.msg || data?.error_description || "GBK Loyalty sign-in failed");
+    window.localStorage.setItem("gbkFounderLoyaltyAccessToken", data.access_token);
+    setLoyaltyAccessToken(data.access_token);
+    return data.access_token as string;
+  }
+
+  async function getLoyaltySession(address:string) {
+    let token = loyaltyAccessToken || window.localStorage.getItem("gbkFounderLoyaltyAccessToken") || "";
+    if (token) {
+      try {
+        const current = await loyaltyRequest(token, "my_data", {});
+        const currentWallet = String(current?.profile?.wallet_address || "").toLowerCase();
+        if (!currentWallet || currentWallet === address.toLowerCase()) return token;
+      } catch {}
+    }
+    token = await createLoyaltyAnonymousSession();
+    return token;
+  }
+
+  async function syncLoyaltyNetwork(address = wallet) {
+    if (!address) return;
+    setNetworkBusy(true);
+    setLoyaltySyncStatus("Connecting Founder dashboard to GBK Loyalty…");
+    try {
+      const token = await getLoyaltySession(address);
+      await loyaltyRequest(token, "profile_upsert", {
+        role: "founder",
+        full_name: "GBK Founder",
+        country: selectedCountry || null,
+        wallet_address: address,
+      });
+      const synced = await loyaltyRequest(token, "founder_sync_verified_membership", {
+        country: selectedCountry || null,
+      });
+      const network = await loyaltyRequest(token, "founder_network", {});
+      setFounderNetwork({ users: network.users || [], businesses: network.businesses || [] });
+      setFounderReferralCode(synced.founderReferralCode || synced.founder?.founder_referral_code || "");
+      setLoyaltyConnected(true);
+      setLoyaltySyncStatus(`Connected ✓ · ${(network.users || []).length} users · ${(network.businesses || []).length} businesses`);
+    } catch (error) {
+      setLoyaltyConnected(false);
+      setLoyaltySyncStatus(error instanceof Error ? error.message : "GBK Loyalty connection failed");
+    } finally {
+      setNetworkBusy(false);
+    }
+  }
+
+  async function addFounderNetworkUser() {
+    if (!wallet) return setLoyaltySyncStatus("Connect your Founder wallet first.");
+    setNetworkBusy(true);
+    try {
+      const token = await getLoyaltySession(wallet);
+      const targetCountry = founderUserCountry || selectedCountry;
+      if (!founderUserName.trim() || !founderUserContact.trim() || !targetCountry || targetCountry === "Global") {
+        throw new Error("Enter user name, mobile/email and a specific country.");
+      }
+      await loyaltyRequest(token, "founder_add_user", {
+        referred_name: founderUserName.trim(),
+        referred_email: founderUserContact.includes("@") ? founderUserContact.trim() : null,
+        referred_phone: founderUserContact.includes("@") ? null : founderUserContact.trim(),
+        country: targetCountry,
+      });
+      setFounderUserName(""); setFounderUserContact(""); setFounderUserCountry("");
+      setLoyaltySyncStatus("User added to your GBK Loyalty Founder network ✓");
+      await syncLoyaltyNetwork(wallet);
+    } catch (error) {
+      setLoyaltySyncStatus(error instanceof Error ? error.message : "User could not be added");
+      setNetworkBusy(false);
+    }
+  }
+
+  async function addFounderNetworkBusiness() {
+    if (!wallet) return setLoyaltySyncStatus("Connect your Founder wallet first.");
+    setNetworkBusy(true);
+    try {
+      const token = await getLoyaltySession(wallet);
+      const targetCountry = founderBusinessCountry || selectedCountry;
+      if (!founderBusinessName.trim() || !founderBusinessCity.trim() || !targetCountry || targetCountry === "Global") {
+        throw new Error("Enter business name, city and a specific country.");
+      }
+      await loyaltyRequest(token, "founder_add_business", {
+        business_name: founderBusinessName.trim(),
+        owner_name: founderBusinessOwner.trim() || null,
+        phone: founderBusinessContact.includes("@") ? null : founderBusinessContact.trim() || null,
+        email: founderBusinessContact.includes("@") ? founderBusinessContact.trim() : null,
+        category: founderBusinessCategory,
+        country: targetCountry,
+        city: founderBusinessCity.trim(),
+        address: founderBusinessAddress.trim() || null,
+        website: founderBusinessWebsite.trim() || null,
+        loyalty_offer_percent: Number(founderBusinessOffer.replace("%","")),
+      });
+      setFounderBusinessName(""); setFounderBusinessOwner(""); setFounderBusinessContact(""); setFounderBusinessCity(""); setFounderBusinessCountry(""); setFounderBusinessAddress(""); setFounderBusinessWebsite("");
+      setLoyaltySyncStatus("Business added to your GBK Loyalty network ✓ · owner activation is still required before public listing");
+      await syncLoyaltyNetwork(wallet);
+    } catch (error) {
+      setLoyaltySyncStatus(error instanceof Error ? error.message : "Business could not be added");
+      setNetworkBusy(false);
+    }
   }
 
   async function refreshMembershipStatus(address = wallet) {
@@ -566,41 +718,65 @@ export default function Home() {
 
         <section className="panel founderNetworkPanel" id="founder-referral-network">
           <div className="panelHead">
-            <div><h3>👥 Founder Referral Network</h3><p>Manage your Founder-linked users and businesses through GBK Loyalty.</p></div>
-            <span className="badge">NETWORK</span>
+            <div><h3>👥 Founder Referral Network</h3><p>Founder dashboard ↔ GBK Loyalty — add users and businesses without leaving your Founder workspace.</p></div>
+            <span className="badge">CONNECTED</span>
           </div>
+
           <div className="founderNetworkHero">
             <div>
               <span>YOUR FOUNDER BUSINESS REFERRAL CODE</span>
-              <strong>{founderReferralCode || (wallet ? "Available after Founder verification" : "Connect and verify your Founder wallet")}</strong>
-              <small>Share this code with a business owner. Founder attribution is created only when the business uses your valid code.</small>
+              <strong>{founderReferralCode || (wallet ? "Syncing from GBK Loyalty…" : "Connect and verify your Founder wallet")}</strong>
+              <small>{loyaltySyncStatus}</small>
             </div>
-            <button className="hubBtn" type="button" disabled={!founderReferralCode} onClick={async () => {
-              if (!founderReferralCode) return;
-              try { await navigator.clipboard.writeText(founderReferralCode); setReferralCopied(true); window.setTimeout(() => setReferralCopied(false), 1800); } catch {}
-            }}>{referralCopied ? "✓ Copied" : "Copy Code"}</button>
-          </div>
-          <div className="founderNetworkGrid">
-            <div className="founderNetworkCard">
-              <div className="founderNetworkIcon">👤</div>
-              <div><b>My User Referrals</b><small>Invite users and manage Founder-linked user opportunities through GBK Loyalty.</small></div>
-              <a className="hubBtn" href="https://loyalty.gbkai.com" target="_blank" rel="noreferrer">Open User Network ↗</a>
-            </div>
-            <div className="founderNetworkCard">
-              <div className="founderNetworkIcon">🏢</div>
-              <div><b>My Business Referrals</b><small>Add businesses or share your Founder code. Businesses may also register directly without a Founder.</small></div>
-              <a className="hubBtn" href="https://loyalty.gbkai.com" target="_blank" rel="noreferrer">Open Business Network ↗</a>
-            </div>
-            <div className="founderNetworkCard">
-              <div className="founderNetworkIcon">🪙</div>
-              <div><b>Loyalty Reward Connection</b><small>For qualifying orders from a business linked to you, the current program allocates 20% of the loyalty reward pool to the Founder.</small></div>
-              <a className="hubBtn" href="https://loyalty.gbkai.com" target="_blank" rel="noreferrer">Open Loyalty ↗</a>
+            <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+              <button className="hubBtn" type="button" disabled={!founderReferralCode} onClick={async()=>{if(!founderReferralCode)return;try{await navigator.clipboard.writeText(founderReferralCode);setReferralCopied(true);window.setTimeout(()=>setReferralCopied(false),1800)}catch{}}}>{referralCopied ? "✓ Copied" : "Copy Code"}</button>
+              <button className="primary" type="button" disabled={!wallet||networkBusy} onClick={()=>void syncLoyaltyNetwork(wallet)}>{networkBusy ? "Syncing…" : "↻ Sync Loyalty"}</button>
             </div>
           </div>
+
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))",gap:14,marginTop:16}}>
+            <div className="coreCard" style={{padding:18}}>
+              <div style={{fontSize:26}}>👤</div>
+              <b>Add User to My Network</b>
+              <small>Country Founders can add users in their assigned country. Global Founders can add users globally by selecting a country.</small>
+              <input style={{marginTop:10}} value={founderUserName} onChange={e=>setFounderUserName(e.target.value)} placeholder="User full name"/>
+              <input value={founderUserContact} onChange={e=>setFounderUserContact(e.target.value)} placeholder="Mobile or email"/>
+              <select value={founderUserCountry || selectedCountry} onChange={e=>setFounderUserCountry(e.target.value)}><option value="">Select country</option>{countryOptions.map(([flag,name])=><option key={name} value={name}>{flag} {name}</option>)}</select>
+              <button className="primary" type="button" disabled={!loyaltyConnected||networkBusy} onClick={()=>void addFounderNetworkUser()}>{networkBusy ? "Saving…" : "＋ Add User"}</button>
+            </div>
+
+            <div className="coreCard" style={{padding:18}}>
+              <div style={{fontSize:26}}>🏢</div>
+              <b>Add Business to My Network</b>
+              <small>Businesses appear in your Founder network immediately. Owner activation and funding are required before customer-facing activation.</small>
+              <input style={{marginTop:10}} value={founderBusinessName} onChange={e=>setFounderBusinessName(e.target.value)} placeholder="Business name"/>
+              <select value={founderBusinessCategory} onChange={e=>setFounderBusinessCategory(e.target.value)}>{loyaltyBusinessCategories.map(x=><option key={x}>{x}</option>)}</select>
+              <input value={founderBusinessOwner} onChange={e=>setFounderBusinessOwner(e.target.value)} placeholder="Owner / contact name"/>
+              <input value={founderBusinessContact} onChange={e=>setFounderBusinessContact(e.target.value)} placeholder="Mobile or email"/>
+              <input value={founderBusinessCity} onChange={e=>setFounderBusinessCity(e.target.value)} placeholder="City"/>
+              <select value={founderBusinessCountry || selectedCountry} onChange={e=>setFounderBusinessCountry(e.target.value)}><option value="">Select country</option>{countryOptions.map(([flag,name])=><option key={name} value={name}>{flag} {name}</option>)}</select>
+              <input value={founderBusinessAddress} onChange={e=>setFounderBusinessAddress(e.target.value)} placeholder="Address"/>
+              <input value={founderBusinessWebsite} onChange={e=>setFounderBusinessWebsite(e.target.value)} placeholder="Website (optional)"/>
+              <select value={founderBusinessOffer} onChange={e=>setFounderBusinessOffer(e.target.value)}><option>5%</option><option>10%</option><option>15%</option><option>20%</option></select>
+              <button className="primary" type="button" disabled={!loyaltyConnected||networkBusy} onClick={()=>void addFounderNetworkBusiness()}>{networkBusy ? "Saving…" : "＋ Add Business"}</button>
+            </div>
+          </div>
+
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))",gap:14,marginTop:16}}>
+            <div className="offerPreview">
+              <b>👤 My User Referrals ({founderNetwork.users.length})</b>
+              {founderNetwork.users.length===0 ? <span>No users added yet.</span> : founderNetwork.users.slice(0,20).map((u:any)=><div key={u.id} style={{display:"flex",justifyContent:"space-between",gap:10,padding:"9px 0",borderBottom:"1px solid #e5e7eb"}}><strong>{u.referred_name}</strong><span>{u.country} · {u.status}</span></div>)}
+            </div>
+            <div className="offerPreview">
+              <b>🏢 My Business Referrals ({founderNetwork.businesses.length})</b>
+              {founderNetwork.businesses.length===0 ? <span>No businesses added yet.</span> : founderNetwork.businesses.slice(0,20).map((b:any)=><div key={b.id} style={{display:"flex",justifyContent:"space-between",gap:10,padding:"9px 0",borderBottom:"1px solid #e5e7eb"}}><strong>{b.business_name}</strong><span>{b.city}, {b.country} · {b.listing_status || "PENDING"}</span></div>)}
+            </div>
+          </div>
+
           <div className="founderNetworkFlow">
             <span>FOUNDER</span><i>→</i><span>USER / BUSINESS</span><i>→</i><span>GBK LOYALTY</span><i>→</i><span>QUALIFYING ACTIVITY</span>
           </div>
-          <div className="notice"><b>Referral rules:</b> Founder membership does not require a referral. Business registration is open to everyone. A valid Founder code is optional and creates Founder attribution only when the business uses that code. Country Founder referrals remain subject to country rules.</div>
+          <div className="notice"><b>Connection rules:</b> Founder membership is verified from the existing Founder membership record for the connected wallet. No new purchase is required. Business registration remains open to everyone; Founder attribution applies when the business is linked to the verified Founder. Country Founder referrals remain country-restricted.</div>
         </section>
 
         <section className="panel founderBenefits" id="founder-benefits">
