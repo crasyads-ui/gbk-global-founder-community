@@ -424,8 +424,13 @@ export default function Home() {
     setMembershipLoading(true);
     try {
       const data = await founderApi({ action: "status", wallet: address });
-      setMembershipRecord(data.memberships?.[0] || null);
+      const activeMembership = data.memberships?.[0] || null;
+      setMembershipRecord(activeMembership);
       setFounderReferralCode(data.founderReferralCode || "");
+      if (activeMembership?.status === "active") {
+        setVerificationStatus("Founder membership already verified ✓");
+        setTxHash(activeMembership.tx_hash || "");
+      }
     } catch (error) {
       setVerificationStatus(error instanceof Error ? error.message : "Membership status unavailable");
     } finally {
@@ -682,17 +687,18 @@ export default function Home() {
             <div><b>Selected membership</b><strong>{selectedTier ? `${membershipTiers[selectedTier].title} · ${membershipTiers[selectedTier].amount}` : "Choose a membership level above"}</strong><small>Membership verification uses the selected USD threshold; no private key or seed phrase is requested.</small></div>
             <a className="primary" href={SWAP_URL} target="_blank" rel="noreferrer">{selectedTier ? `Continue to GBK Swap ↗` : "Open GBK Swap ↗"}</a>
           </div>
+          {membershipRecord?.status === "active" ? <div className="notice"><b>✓ Already verified:</b> This Founder membership is active. No new transaction submission or purchase is required. The existing Founder membership can now be connected to GBK Loyalty.</div> : null}
           <div className="confirmationFields">
             <div><span>Verification status</span><b>{verificationStatus}</b></div>
             <div><span>Transaction hash</span><b>{txHash ? `${txHash.slice(0, 10)}…${txHash.slice(-8)}` : "Not submitted"}</b></div>
             <div><span>Wallet</span><b>{wallet ? shortWallet : "Connect wallet first"}</b></div>
             <div><span>Holding rule</span><b>Keep ≥ 50% of activation GBK baseline</b></div>
           </div>
-          <div className="verifyBox"><label>BSC transaction hash</label>
+          {membershipRecord?.status !== "active" && <div className="verifyBox"><label>BSC transaction hash</label>
           <div className="confirmationInputRow">
             <input value={txHash} onChange={(e) => setTxHash(e.target.value.trim())} placeholder="Paste your 0x… transaction hash" aria-label="BSC transaction hash" />
             <button className="primary" type="button" disabled={!wallet || !selectedTier || !txHash} onClick={verifyFounderTransaction}>Verify Membership →</button>
-          </div></div>
+          </div></div>}
           <div className="notice"><b>Automatic checks:</b> successful BSC receipt → connected wallet is the transaction sender → selected USDT threshold is met → GBK is received by the same wallet → activation GBK balance is recorded → Founder status is activated. The dashboard then checks the 50% holding rule. No seed phrase or private key is ever requested.</div>
         </section>
 
