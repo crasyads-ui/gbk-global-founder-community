@@ -566,7 +566,7 @@ export default function Home() {
 
         <section className="panel founderBenefits" id="founder-benefits">
           <div className="panelHead">
-            <div><h3>👑 Founder Benefits</h3><p>Three core participation benefits available through the GBK Founder ecosystem.</p></div>
+            <div><h3>👑 Founder Benefits — 3 Core Benefits</h3><p>Holding rewards, Founder referrals, and Business Loyalty participation.</p></div>
             <span className="badge">CORE BENEFITS</span>
           </div>
           <div className="benefitGrid">
