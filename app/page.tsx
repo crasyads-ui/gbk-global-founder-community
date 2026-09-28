@@ -370,10 +370,16 @@ export default function Home() {
     setNetworkBusy(true);
     try {
       const token = await getLoyaltySession(wallet);
-      const targetCountry = founderUserCountry || selectedCountry;
+      const targetCountry = (founderUserCountry || selectedCountry || window.localStorage.getItem("gbkFounderCountry") || "").trim();
       if (!founderUserName.trim() || !founderUserContact.trim() || !targetCountry || targetCountry === "Global") {
-        throw new Error("Enter user name, mobile/email and a specific country.");
+        throw new Error("Select your Founder country first, then enter user name and mobile/email.");
       }
+      await loyaltyRequest(token, "profile_upsert", {
+        role: "founder",
+        full_name: "GBK Founder",
+        country: targetCountry,
+        wallet_address: wallet,
+      });
       await loyaltyRequest(token, "founder_add_user", {
         referred_name: founderUserName.trim(),
         referred_email: founderUserContact.includes("@") ? founderUserContact.trim() : null,
@@ -394,10 +400,16 @@ export default function Home() {
     setNetworkBusy(true);
     try {
       const token = await getLoyaltySession(wallet);
-      const targetCountry = founderBusinessCountry || selectedCountry;
+      const targetCountry = (founderBusinessCountry || selectedCountry || window.localStorage.getItem("gbkFounderCountry") || "").trim();
       if (!founderBusinessName.trim() || !founderBusinessCity.trim() || !targetCountry || targetCountry === "Global") {
-        throw new Error("Enter business name, city and a specific country.");
+        throw new Error("Select your Founder country first, then enter business name and city.");
       }
+      await loyaltyRequest(token, "profile_upsert", {
+        role: "founder",
+        full_name: "GBK Founder",
+        country: targetCountry,
+        wallet_address: wallet,
+      });
       await loyaltyRequest(token, "founder_add_business", {
         business_name: founderBusinessName.trim(),
         owner_name: founderBusinessOwner.trim() || null,
@@ -739,6 +751,8 @@ export default function Home() {
               <button className="primary" type="button" disabled={!wallet||networkBusy} onClick={()=>void syncLoyaltyNetwork(wallet)}>{networkBusy ? "Syncing…" : "↻ Sync Loyalty"}</button>
             </div>
           </div>
+
+          <div className="notice" style={{marginTop:16}}><b>Founder country:</b> <select style={{marginLeft:8}} value={selectedCountry} onChange={e=>{setSelectedCountry(e.target.value);window.localStorage.setItem("gbkFounderCountry",e.target.value);}}><option value="">Select country</option>{countryOptions.map(([flag,name])=><option key={name} value={name}>{flag} {name}</option>)}</select><small style={{display:"block",marginTop:6}}>Required for Country Founder customer and merchant registration.</small></div>
 
           <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))",gap:14,marginTop:16}}>
             <div className="coreCard" style={{padding:18}}>
