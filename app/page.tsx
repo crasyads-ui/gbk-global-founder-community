@@ -714,7 +714,25 @@ export default function Home() {
           <div className="notice"><b>Automatic checks:</b> successful BSC receipt → connected wallet is the transaction sender → selected USDT threshold is met → GBK is received by the same wallet → activation GBK balance is recorded → Founder status is activated. The dashboard then checks the 50% holding rule. No seed phrase or private key is ever requested.</div>
         </section>
 
-        <section className="panel membershipStatusPanel" id="membership-status">
+                <section className="panel" id="founder-country-selection">
+          <div className="panelHead">
+            <div>
+              <h3>🌍 Founder Country</h3>
+              <p>Select the country for your Founder network and local customer/merchant registration.</p>
+            </div>
+            <span className="badge">REQUIRED FOR COUNTRY FOUNDER</span>
+          </div>
+          <div className="coreCard" style={{padding:18}}>
+            <label style={{display:"block",fontWeight:700,marginBottom:8}}>Your Founder country</label>
+            <select value={selectedCountry} onChange={e=>{const value=e.target.value;setSelectedCountry(value);window.localStorage.setItem("gbkFounderCountry",value);setLoyaltySyncStatus(value ? `Founder country set to ${value} ✓` : "Founder country not selected");}} style={{width:"100%",minHeight:52,fontSize:16}}>
+              <option value="">Select your country</option>
+              {countryOptions.map(([flag,name])=><option key={name} value={name}>{flag} {name}</option>)}
+            </select>
+            <small style={{display:"block",marginTop:8}}>Choose your assigned country before adding customers or new merchants. Your selection is saved on this device.</small>
+          </div>
+        </section>
+
+<section className="panel membershipStatusPanel" id="membership-status">
           <div className="panelHead">
             <div><h3>🏅 Founder Membership Status</h3><p>Live status from the Founder verification backend.</p></div>
             <span className={`statusPill ${membershipRecord?.status === "active" ? "connected" : ""}`}>{membershipLoading ? "CHECKING…" : membershipRecord?.status === "active" ? "MEMBERSHIP ACTIVE" : "AWAITING VERIFICATION"}</span>
