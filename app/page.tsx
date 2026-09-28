@@ -71,6 +71,7 @@ export default function Home() {
   const [selectedCountry, setSelectedCountry] = useState("");
   const [membershipRecord, setMembershipRecord] = useState<any>(null);
   const [referralCode, setReferralCode] = useState("");
+  const [founderReferralCode, setFounderReferralCode] = useState("");
   const [selectedTier, setSelectedTier] = useState<keyof typeof membershipTiers | null>(null);
   const [txHash, setTxHash] = useState("");
   const [verificationStatus, setVerificationStatus] = useState("Not submitted");
@@ -272,6 +273,7 @@ export default function Home() {
     try {
       const data = await founderApi({ action: "status", wallet: address });
       setMembershipRecord(data.memberships?.[0] || null);
+      setFounderReferralCode(data.founderReferralCode || "");
     } catch (error) {
       setVerificationStatus(error instanceof Error ? error.message : "Membership status unavailable");
     } finally {
@@ -303,6 +305,7 @@ export default function Home() {
       });
       if (data.membership) {
         setMembershipRecord(data.membership);
+        setFounderReferralCode(data.founderReferralCode || "");
         setVerificationStatus("Founder membership verified ✓");
       } else {
         setVerificationStatus(data.message || "Transaction does not qualify yet.");
@@ -560,6 +563,46 @@ export default function Home() {
         </section>
 
         
+
+        <section className="panel founderBenefits" id="founder-benefits">
+          <div className="panelHead">
+            <div><h3>👑 Founder Benefits</h3><p>Three core participation benefits available through the GBK Founder ecosystem.</p></div>
+            <span className="badge">CORE BENEFITS</span>
+          </div>
+          <div className="benefitGrid">
+            <article className="benefitCard">
+              <span className="benefitNumber">01</span>
+              <div className="benefitIcon">🪙</div>
+              <h4>GBK Holding Benefit</h4>
+              <p>Eligible Founder members can hold GBK in a BNB Smart Chain compatible wallet and participate in the applicable additional GBK reward program.</p>
+              <strong>0.7%–6.3% additional rewards*</strong>
+              <small>Rate and eligibility depend on the active Founder program rules and tier. GBK remains in your own wallet.</small>
+            </article>
+            <article className="benefitCard">
+              <span className="benefitNumber">02</span>
+              <div className="benefitIcon">🔗</div>
+              <h4>Founder Referral Benefit</h4>
+              <p>Refer genuine users to the GBK ecosystem through the separate referral program on app.gbkai.com.</p>
+              <div className="benefitStats"><b>L1 <em>6%</em></b><b>L2 <em>2%</em></b></div>
+              <a className="hubBtn" href={EARN_URL} target="_blank" rel="noreferrer">Open Earn Dashboard ↗</a>
+              <small>Referral rewards apply only to qualifying activity under the active program rules.</small>
+            </article>
+            <article className="benefitCard">
+              <span className="benefitNumber">03</span>
+              <div className="benefitIcon">🏢</div>
+              <h4>Business Referral + Loyalty</h4>
+              <p>Refer businesses to GBK Loyalty. A business can also register directly; the Founder relationship applies only when the business uses the Founder referral code.</p>
+              <strong>20% of the loyalty reward pool*</strong>
+              <small>For qualifying orders from a linked business. This is 20% of the reward pool, not 20% of the customer's purchase amount.</small>
+              <div className="referralCodeMini"><span>Your business referral code</span><b>{founderReferralCode || (wallet ? "Available after Founder verification" : "Connect and verify your Founder wallet")}</b></div>
+            </article>
+          </div>
+          <div className="benefitExample">
+            <div><b>📊 Illustrative business example</b><span>10 referred businesses × 100 qualifying orders/day = 1,000 qualifying orders/day.</span></div>
+            <p>If an example order is ₹1,000 and the merchant offers 10% loyalty, the reward pool is ₹100 equivalent and the Founder allocation is 20% of that pool = ₹20 equivalent/order. Actual results vary with merchant offers, qualifying orders, GBK price, minimum thresholds and settlement.</p>
+          </div>
+          <div className="notice"><b>* Program terms:</b> Reward rates, eligibility, qualifying activity and settlement conditions are subject to the active GBK program rules. Examples are illustrative and do not guarantee income, customers, sales, profits or returns.</div>
+        </section>
 
         <section className="panel founderGrowthHub" id="growth-hub">
   <div className="panelHead">
