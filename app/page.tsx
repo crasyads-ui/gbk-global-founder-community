@@ -16,6 +16,7 @@ const nav = [
   ["GBK Swap", SWAP_URL, "↔"],
   ["Referrals", "#referrals", "◎"],
   ["Merchants", "#merchants", "▦"],
+  ["Claim Verification", "#business-claims", "🛡️"],
   ["AI Marketplace", "#marketplace", "✦"],
   ["Learn", "/learn", "◈"],
   ["Agri", "https://agri.gbkai.com", "♧"],
@@ -105,6 +106,8 @@ export default function Home() {
   const [founderBusinessAddress, setFounderBusinessAddress] = useState("");
   const [founderBusinessWebsite, setFounderBusinessWebsite] = useState("");
   const [networkBusy, setNetworkBusy] = useState(false);
+  const [claimRequests, setClaimRequests] = useState<any[]>([]);
+  const [claimBusy, setClaimBusy] = useState(false);
   const walletConnectProviderRef = useRef<any>(null);
 
   type EthereumProvider = {
@@ -337,6 +340,32 @@ export default function Home() {
     return token;
   }
 
+  async function loadClaimRequests(address = wallet) {
+    if (!address) return;
+    try {
+      const token = await getLoyaltySession(address);
+      const data = await loyaltyRequest(token, "claim_queue", {});
+      setClaimRequests(data.claims || []);
+    } catch (error) {
+      setLoyaltySyncStatus(error instanceof Error ? error.message : "Claim queue could not be loaded");
+    }
+  }
+
+  async function decideClaim(claimId:string, decision:"APPROVE"|"REJECT") {
+    if (!wallet) return;
+    setClaimBusy(true);
+    try {
+      const token = await getLoyaltySession(wallet);
+      await loyaltyRequest(token, "claim_decision", { claim_id: claimId, decision });
+      await loadClaimRequests(wallet);
+      setLoyaltySyncStatus(decision === "APPROVE" ? "Claim approved ✓" : "Claim rejected");
+    } catch (error) {
+      setLoyaltySyncStatus(error instanceof Error ? error.message : "Claim decision failed");
+    } finally {
+      setClaimBusy(false);
+    }
+  }
+
   async function syncLoyaltyNetwork(address = wallet) {
     if (!address) return;
     setNetworkBusy(true);
@@ -353,7 +382,9 @@ export default function Home() {
         country: selectedCountry || null,
       });
       const network = await loyaltyRequest(token, "founder_network", {});
+      const claims = await loyaltyRequest(token, "claim_queue", {});
       setFounderNetwork({ users: network.users || [], businesses: network.businesses || [] });
+      setClaimRequests(claims.claims || []);
       setFounderReferralCode(synced.founderReferralCode || synced.founder?.founder_referral_code || "");
       setLoyaltyConnected(true);
       setLoyaltySyncStatus(`Connected ✓ · ${(network.users || []).length} users · ${(network.businesses || []).length} businesses`);
@@ -979,6 +1010,26 @@ export default function Home() {
         <section className="panel founderHub" id="founder-hub"><div className="panelHead"><div><h3>🚀 Founder Workspace</h3><p>Share GBK content, invite genuine community members and track your campaign activity.</p></div><span className="badge">FOUNDER TOOLS</span></div><div className="hubGrid"><div className="hubCard"><b>🔗 Your GBK Share Link</b><small>Use the official ecosystem entry point when sharing. Copy it once, then post through your own social accounts.</small><button className="hubBtn" onClick={() => navigator.clipboard?.writeText("https://app.gbkai.com")}>Copy GBK Link</button></div><div className="hubCard"><b>📣 Social Share</b><small>Share the GBK ecosystem through supported social platforms. Review content before posting.</small><div className="shareRow"><a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fapp.gbkai.com" target="_blank" rel="noreferrer">Facebook</a><a href="https://twitter.com/intent/tweet?url=https%3A%2F%2Fapp.gbkai.com&text=Explore%20the%20GBK%20ecosystem" target="_blank" rel="noreferrer">X</a><a href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fapp.gbkai.com" target="_blank" rel="noreferrer">LinkedIn</a><a href="https://wa.me/?text=Explore%20the%20GBK%20ecosystem%20https%3A%2F%2Fapp.gbkai.com" target="_blank" rel="noreferrer">WhatsApp</a></div></div><div className="hubCard"><b>🎬 Short Video Hub</b><small>Ready-to-share topics: What is GBK? · How GBK Swap works · Buy & Hold · AI Marketplace · Learn · Agri.</small><Link className="hubBtn" href="/tools">Open Content Studio →</Link></div><div className="hubCard"><b>📊 Founder Analytics</b><small>Track content reach, website visits, wallet connections, successful swaps and returning users once live analytics is connected.</small><Link className="hubBtn" href="/tools">Open Analytics →</Link></div></div></section>
 
         <section className="panel referralPanel" id="referrals"><div className="panelHead"><div><h3>🔗 Referral Benefits · app.gbkai.com</h3><p>Referral program participation through the GBK ecosystem.</p></div><span className="badge">L1 + L2</span></div><div className="refGrid"><div className="refCard"><span>L1</span><strong>6%</strong><p>Direct referral reward</p><small>Eligible activity only</small></div><div className="refCard"><span>L2</span><strong>2%</strong><p>Second-level referral reward</p><small>Eligible activity only</small></div><div className="refFlow"><b>Connect Wallet</b><i>→</i><b>Get Referral Link</b><i>→</i><b>Invite Genuine Users</b><i>→</i><b>Eligible Swap</b><i>→</i><b>Reward Recorded</b></div></div><div className="notice">Referral rewards are subject to app.gbkai.com program rules, eligibility, completed qualifying transactions and applicable terms. No guaranteed income. No self-referrals, duplicate/fake accounts or spam.</div><div className="refActions"><a href={SWAP_URL} target="_blank" rel="noreferrer">Open GBK Swap ↗</a><a href={EARN_URL} target="_blank" rel="noreferrer">Open Earn ↗</a></div></section>
+
+        <section className="panel businessClaims" id="business-claims">
+          <div className="panelHead"><div><h3>🛡️ Business Claim Verification</h3><p>Verify owner or authorized-representative claims before merchant setup.</p></div><span className="badge">{claimRequests.length} PENDING</span></div>
+          {claimRequests.length ? <div className="directoryResults">{claimRequests.map((claim) => (
+            <article className="businessResult" key={claim.id}>
+              <div className="businessLogo">🏪</div>
+              <div>
+                <b>{claim.suggestion?.business_name || "Business claim"}</b>
+                <span>{[claim.suggestion?.category, claim.suggestion?.city, claim.suggestion?.country].filter(Boolean).join(" · ")}</span>
+                <small><strong>Claimant:</strong> {claim.claimant_name || "—"} · <strong>Contact:</strong> {claim.claimant_contact || "—"}</small>
+                <div className="businessLinks">
+                  <em>🟡 Pending verification</em>
+                  <button className="hubBtn" type="button" disabled={claimBusy} onClick={() => void decideClaim(claim.id,"APPROVE")}>✓ Approve Claim</button>
+                  <button className="hubBtn" type="button" disabled={claimBusy} onClick={() => void decideClaim(claim.id,"REJECT")}>Reject</button>
+                </div>
+              </div>
+            </article>
+          ))}</div> : <div className="directoryEmpty"><b>No pending business claims</b><span>New owner claims will appear here after submission.</span></div>}
+          <div className="notice">Approval verifies the claim request only. The merchant must still connect a Merchant GBK Wallet, complete setup and activate before rewards can run.</div>
+        </section>
 
         <section className="panel businessDirectory" id="business-listings">
           <div className="panelHead"><div><h3>🔎 Global Business Directory</h3><p>Search approved GBK business listings by name, service, category, country or city.</p></div><span className="badge">SEARCH</span></div>
