@@ -378,16 +378,27 @@ export default function Home() {
         country: selectedCountry || null,
         wallet_address: address,
       });
-      const synced = await loyaltyRequest(token, "founder_sync_verified_membership", {
-        country: selectedCountry || null,
-      });
+
+      let synced:any = null;
+      try {
+        synced = await loyaltyRequest(token, "founder_sync_verified_membership", {
+          country: selectedCountry || null,
+        });
+      } catch (syncError) {
+        // If Loyalty already has this wallet marked verified, keep using that
+        // verified Founder record instead of blocking the Founder dashboard.
+        const status = await loyaltyRequest(token, "founder_status", {});
+        if (!status?.founder?.founder_verified) throw syncError;
+        synced = { founder: status.founder, founderReferralCode: status.founder.founder_referral_code || "" };
+      }
+
       const network = await loyaltyRequest(token, "founder_network", {});
       const claims = await loyaltyRequest(token, "claim_queue", {});
       setFounderNetwork({ users: network.users || [], businesses: network.businesses || [] });
       setClaimRequests(claims.claims || []);
       setFounderReferralCode(synced.founderReferralCode || synced.founder?.founder_referral_code || "");
       setLoyaltyConnected(true);
-      setLoyaltySyncStatus(`Connected ✓ · ${(network.users || []).length} users · ${(network.businesses || []).length} businesses`);
+      setLoyaltySyncStatus(`Connected ✓ · ${(network.users || []).length} users · ${(network.businesses || []).length} businesses · Claims ${(claims.claims || []).length}`);
     } catch (error) {
       setLoyaltyConnected(false);
       setLoyaltySyncStatus(error instanceof Error ? error.message : "GBK Loyalty connection failed");
@@ -430,6 +441,11 @@ export default function Home() {
     if (!wallet) return setLoyaltySyncStatus("Connect your Founder wallet first.");
     setNetworkBusy(true);
     try {
+      // Make the Add Business button self-healing: if the dashboard was opened
+      // before Loyalty finished syncing, connect first and then submit.
+      if (!loyaltyConnected) {
+        await syncLoyaltyNetwork(wallet);
+      }
       const token = await getLoyaltySession(wallet);
       const targetCountry = (founderBusinessCountry || selectedCountry || window.localStorage.getItem("gbkFounderCountry") || "").trim();
       if (!founderBusinessName.trim() || !founderBusinessCity.trim() || !targetCountry || targetCountry === "Global") {
