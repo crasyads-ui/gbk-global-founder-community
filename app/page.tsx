@@ -368,7 +368,7 @@ export default function Home() {
       const token = await getLoyaltySession(wallet);
       await loyaltyRequest(token, "claim_decision", { claim_id: claimId, decision });
       await loadClaimRequests(wallet);
-      setLoyaltySyncStatus(decision === "APPROVE" ? "Claim approved ✓" : "Claim rejected");
+      setLoyaltySyncStatus(decision === "APPROVE" ? "Merchant created ✓" : "Merchant claim rejected");
     } catch (error) {
       setLoyaltySyncStatus(error instanceof Error ? error.message : "Claim decision failed");
     } finally {
@@ -775,8 +775,8 @@ export default function Home() {
 
         <section className="panel" id="business-claims" style={{border:"2px solid #c4b5fd",background:"linear-gradient(135deg,#faf5ff,#ffffff)"}}>
           <div className="panelHead">
-            <div><h3>🛡️ Business Claim Verification</h3><p>Review merchant ownership claims submitted through GBK Loyalty.</p></div>
-            <span className="badge">FOUNDER REVIEW CENTER</span>
+            <div><h3>🏪 Merchant Approval & Creation</h3><p>Approve claimed businesses and create their Merchant record for GBK Loyalty onboarding.</p></div>
+            <span className="badge">MERCHANT APPROVAL CENTER</span>
           </div>
           {!wallet ? (
             <div className="notice"><b>Connect your Founder wallet first.</b> Then the verified Founder claim queue will load automatically.</div>
@@ -806,14 +806,14 @@ export default function Home() {
                         <span className="statusPill">🔵 CLAIM PENDING</span>
                       </div>
                       <div style={{display:"flex",gap:10,marginTop:14,flexWrap:"wrap"}}>
-                        <button className="primary" type="button" disabled={claimBusy||!loyaltyConnected} onClick={()=>void decideClaim(claim.id,"APPROVE")}>✓ Approve Claim</button>
+                        <button className="primary" type="button" disabled={claimBusy||!loyaltyConnected} onClick={()=>void decideClaim(claim.id,"APPROVE")}>✓ Approve & Create Merchant</button>
                         <button className="hubBtn" type="button" disabled={claimBusy||!loyaltyConnected} onClick={()=>void decideClaim(claim.id,"REJECT")}>✕ Reject</button>
                       </div>
                     </div>
                   ))}
                 </div>
               )}
-              <div className="notice" style={{marginTop:16}}><b>Review rule:</b> Verify that the claimant is the legitimate owner or authorized representative before approving. Approval moves the claimant into merchant onboarding; it does not activate reward-eligible orders by itself.</div>
+              <div className="notice" style={{marginTop:16}}><b>Review rule:</b> Verify that the claimant is the legitimate owner or authorized representative before approving. Approval creates the Merchant record. The owner must then connect the merchant wallet, accept the terms and fund GBK before the listing becomes 🟢 ACTIVE.</div>
             </>
           )}
         </section>
