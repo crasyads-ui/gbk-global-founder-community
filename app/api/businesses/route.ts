@@ -24,7 +24,7 @@ export async function GET(req: Request) {
 
     if (q) {
       const safe = q.replace(/[,()]/g, " ").trim();
-      params.set("or", `business_name.ilike.*${safe}*,description.ilike.*${safe}*,category.ilike.*${safe}*,city.ilike.*${safe}*,country.ilike.*${safe}*`);
+      params.set("or", `(business_name.ilike.*${safe}*,description.ilike.*${safe}*,category.ilike.*${safe}*,city.ilike.*${safe}*,country.ilike.*${safe}*)`);
     }
     if (country) params.set("country", `ilike.*${country}*`);
     if (city) params.set("city", `ilike.*${city}*`);
