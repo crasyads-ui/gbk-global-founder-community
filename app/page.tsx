@@ -94,6 +94,8 @@ export default function Home() {
   const [loyaltyConnected, setLoyaltyConnected] = useState(false);
   const [loyaltySyncStatus, setLoyaltySyncStatus] = useState("Not connected to GBK Loyalty");
   const [founderNetwork, setFounderNetwork] = useState<{users:any[];businesses:any[]}>({users:[],businesses:[]});
+  const [founderActivity, setFounderActivity] = useState<any[]>([]);
+  const [founderRewardsRaw, setFounderRewardsRaw] = useState("0");
   const [founderUserName, setFounderUserName] = useState("");
   const [founderUserContact, setFounderUserContact] = useState("");
   const [founderUserCountry, setFounderUserCountry] = useState("");
@@ -415,6 +417,8 @@ export default function Home() {
       const network = await loyaltyRequest(token, "founder_network", {});
       const claims = await loyaltyRequest(token, "claim_queue", {});
       setFounderNetwork({ users: network.users || [], businesses: network.businesses || [] });
+      setFounderActivity(network.activity || []);
+      setFounderRewardsRaw(String(network.founderRewardsRaw || "0"));
       setClaimRequests(claims.claims || []);
       setFounderReferralCode(synced.founderReferralCode || synced.founder?.founder_referral_code || "");
       setLoyaltyConnected(true);
@@ -690,7 +694,16 @@ export default function Home() {
             <div className="coreCard"><b>👥 Users Referred</b><strong>{founderNetwork.users.length}</strong><small>Founder network users</small></div>
             <div className="coreCard"><b>🏪 Businesses Referred</b><strong>{founderNetwork.businesses.length}</strong><small>Businesses added by you</small></div>
             <div className="coreCard"><b>🟢 Active Businesses</b><strong>{founderNetwork.businesses.filter((b:any)=>String(b.status||b.loyalty_status||"").toLowerCase()==="active").length}</strong><small>Currently active where status is available</small></div>
-            <div className="coreCard"><b>💰 Founder Rewards</b><strong>Recorded</strong><small>Verified loyalty rewards are tracked by the program</small></div>
+            <div className="coreCard"><b>💰 Founder Rewards</b><strong>{(Number(founderRewardsRaw || "0") / 1e8).toLocaleString(undefined,{maximumFractionDigits:8})} GBK</strong><small>Verified Founder rewards from referred business orders</small></div>
+          </div>
+
+          <div className="coreCard" style={{padding:18,marginTop:16}}>
+            <div style={{display:"flex",justifyContent:"space-between",gap:12,alignItems:"center",flexWrap:"wrap"}}>
+              <div><b style={{fontSize:18}}>📊 Business Activity</b><small style={{display:"block",marginTop:5}}>Live activity from businesses linked to your Founder account.</small></div>
+              <span className="statusPill">{founderActivity.length} orders</span>
+            </div>
+            {founderNetwork.businesses.length === 0 ? <div className="notice" style={{marginTop:12}}>No referred businesses yet. Add your first business above.</div> : <div style={{display:"grid",gap:10,marginTop:12}}>{founderNetwork.businesses.map((b:any)=>{const orders=founderActivity.filter((o:any)=>o.merchant_id===b.id); const latest=orders[0]; const active=String(b.loyalty_status||"").toLowerCase()==="active"; return <div key={b.id} className="notice" style={{display:"flex",justifyContent:"space-between",gap:12,alignItems:"center",flexWrap:"wrap"}}><div><b>🏪 {b.business_name}</b><small style={{display:"block",marginTop:4}}>{b.city || ""} · {b.country || ""} · {active ? "🟢 Active" : "🟡 " + (b.invitation_status || b.loyalty_status || "Pending")}</small></div><div style={{textAlign:"right"}}><b>{orders.length} order{orders.length===1?"":"s"}</b><small style={{display:"block",marginTop:4}}>{latest ? (latest.reward_settlement_status === "SETTLED" ? "GBK reward settled ✓" : latest.payment_status || "Order activity") : "Waiting for first customer order"}</small></div></div>})}</div>}
+            {founderActivity.length > 0 && <div style={{marginTop:12,display:"grid",gap:8}}>{founderActivity.slice(0,10).map((o:any)=><div key={o.id} style={{padding:"10px 12px",border:"1px solid #e5e7eb",borderRadius:12,display:"flex",justifyContent:"space-between",gap:10,flexWrap:"wrap"}}><span><b>{o.order_reference || "GBK Order"}</b><small style={{display:"block",marginTop:3}}>{o.business_name} · {o.currency || ""} {Number(o.amount_minor||0)/100}</small></span><span style={{textAlign:"right"}}><b>{o.reward_settlement_status || o.payment_status || "Pending"}</b><small style={{display:"block",marginTop:3}}>{o.created_at ? new Date(o.created_at).toLocaleString() : ""}</small></span></div>)}</div>}
           </div>
 
           <div className="coreCard" style={{padding:18,marginTop:16}}>
