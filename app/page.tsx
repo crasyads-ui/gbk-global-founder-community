@@ -496,6 +496,11 @@ export default function Home() {
       const data = await founderApi({ action: "status", wallet: address });
       const activeMembership = data.memberships?.[0] || null;
       setMembershipRecord(activeMembership);
+      const membershipCountry = String(activeMembership?.country || activeMembership?.country_name || "").trim();
+      if (membershipCountry) {
+        setSelectedCountry(membershipCountry);
+        window.localStorage.setItem("gbkFounderCountry", membershipCountry);
+      }
       setFounderReferralCode(data.founderReferralCode || "");
       if (activeMembership?.status === "active") {
         setVerificationStatus("Founder membership already verified ✓");
@@ -544,7 +549,7 @@ export default function Home() {
 
   const shortWallet = wallet ? `${wallet.slice(0, 6)}…${wallet.slice(-4)}` : "";
   const membershipCountry = String(membershipRecord?.country || membershipRecord?.country_name || "").trim();
-  const displayCountry = selectedCountry || membershipCountry;
+  const displayCountry = membershipCountry || selectedCountry;
   const countryMatch = countryOptions.find(([nameFlag, name]) => name === displayCountry || nameFlag === displayCountry);
   const countryFlag = countryMatch?.[0] || "🏳️";
   const countryName = countryMatch?.[1] || displayCountry || "Country";
