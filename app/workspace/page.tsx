@@ -50,6 +50,17 @@ export default function FounderWorkspace() {
             <small style={{display:"block",marginTop:12,color:"#64748b"}}>Owner claim approval happens through the GBK Loyalty review flow. Activation still requires owner verification, payment details, wallet connection, terms and GBK funding.</small>
           </section>
 
+          <section style={{marginTop:18,padding:18,borderRadius:18,border:"2px solid #f59e0b",background:"linear-gradient(135deg,#fffbeb,#ffffff)"}}>
+            <div style={{fontSize:12,letterSpacing:1.5,color:"#b45309",fontWeight:900}}>BUSINESS APPROVAL CENTER</div>
+            <h2 style={{margin:"6px 0 5px",fontSize:22}}>🛡️ Founder Business Approval</h2>
+            <p style={{margin:"0 0 14px",color:"#64748b",lineHeight:1.5}}>Review new business submissions and owner claims before merchant activation. Connect the same verified Founder wallet in GBK Loyalty to approve or reject requests.</p>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(210px,1fr))",gap:10}}>
+              <a href="https://loyalty.gbkai.com" target="_blank" rel="noreferrer" style={{padding:"13px 14px",borderRadius:12,background:"#f59e0b",color:"#fff",fontWeight:900,textDecoration:"none",textAlign:"center"}}>🛡️ Open Business Approval →</a>
+              <a href="https://loyalty.gbkai.com" target="_blank" rel="noreferrer" style={{padding:"13px 14px",borderRadius:12,background:"#fff",border:"1px solid #fcd34d",color:"#92400e",fontWeight:900,textDecoration:"none",textAlign:"center"}}>👤 Open Owner Claims →</a>
+            </div>
+            <small style={{display:"block",marginTop:12,color:"#92400e"}}>Approval does not activate the merchant automatically. After approval, the owner still completes wallet connection, terms, payment details and required GBK funding.</small>
+          </section>
+
           <div style={{marginTop:18,padding:14,borderRadius:14,background:"#f8fafc",border:"1px solid #eef2f7",color:"#64748b",fontSize:12,lineHeight:1.5}}>
             Workspace links use the currently available GBK ecosystem services. Business listing access, leads and other opportunities remain subject to applicable program rules and availability.
           </div>
