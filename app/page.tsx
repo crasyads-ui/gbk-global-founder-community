@@ -878,6 +878,51 @@ export default function Home() {
           <div className="notice"><b>Connection rules:</b> Founder membership is verified from the existing Founder membership record for the connected wallet. No new purchase is required. Business registration remains open to everyone; Founder attribution applies when the business is linked to the verified Founder. Country Founder referrals remain country-restricted.</div>
         </section>
 
+        <section className="panel" id="business-claims" style={{border:"2px solid #c4b5fd",background:"linear-gradient(135deg,#faf5ff,#ffffff)"}}>
+          <div className="panelHead">
+            <div><h3>🛡️ Business Claim Verification</h3><p>Review merchant ownership claims submitted through GBK Loyalty.</p></div>
+            <span className="badge">FOUNDER REVIEW CENTER</span>
+          </div>
+          {!wallet ? (
+            <div className="notice"><b>Connect your Founder wallet first.</b> Then the verified Founder claim queue will load automatically.</div>
+          ) : (
+            <>
+              <div className="founderNetworkHero" style={{marginTop:0}}>
+                <div>
+                  <span>PENDING CLAIMS</span>
+                  <strong>{claimRequests.length}</strong>
+                  <small>{loyaltySyncStatus}</small>
+                </div>
+                <button className="primary" type="button" disabled={claimBusy||networkBusy} onClick={()=>void loadClaimRequests(wallet)}>{claimBusy||networkBusy ? "Loading…" : "↻ Refresh Claims"}</button>
+              </div>
+              {claimRequests.length===0 ? (
+                <div className="notice" style={{marginTop:16}}><b>✓ No pending claims.</b> New merchant ownership claims will appear here after submission.</div>
+              ) : (
+                <div style={{display:"grid",gap:12,marginTop:16}}>
+                  {claimRequests.map((claim:any)=>(
+                    <div key={claim.id} className="coreCard" style={{padding:18}}>
+                      <div style={{display:"flex",justifyContent:"space-between",gap:12,alignItems:"flex-start",flexWrap:"wrap"}}>
+                        <div>
+                          <b style={{fontSize:18}}>🏪 {claim.suggestion?.business_name || "Business claim"}</b>
+                          <small style={{display:"block",marginTop:5}}>{claim.suggestion?.city || "—"}, {claim.suggestion?.country || "—"} · {claim.suggestion?.category || "Business"}</small>
+                          <small style={{display:"block",marginTop:5}}>Claimant: <strong>{claim.claimant_name}</strong> · {claim.claimant_contact}</small>
+                          <small style={{display:"block",marginTop:5}}>Submitted: {claim.created_at ? new Date(claim.created_at).toLocaleString() : "—"}</small>
+                        </div>
+                        <span className="statusPill">🔵 CLAIM PENDING</span>
+                      </div>
+                      <div style={{display:"flex",gap:10,marginTop:14,flexWrap:"wrap"}}>
+                        <button className="primary" type="button" disabled={claimBusy||!loyaltyConnected} onClick={()=>void decideClaim(claim.id,"APPROVE")}>✓ Approve Claim</button>
+                        <button className="hubBtn" type="button" disabled={claimBusy||!loyaltyConnected} onClick={()=>void decideClaim(claim.id,"REJECT")}>✕ Reject</button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <div className="notice" style={{marginTop:16}}><b>Review rule:</b> Verify that the claimant is the legitimate owner or authorized representative before approving. Approval moves the claimant into merchant onboarding; it does not activate reward-eligible orders by itself.</div>
+            </>
+          )}
+        </section>
+
         <section className="panel founderBenefits" id="founder-benefits">
           <div className="panelHead">
             <div><h3>👑 Founder Benefits — 3 Core Benefits</h3><p>Holding rewards, Founder referrals, and Business Loyalty participation.</p></div>
