@@ -19,7 +19,7 @@ export async function GET(req: Request) {
       select: "id,business_name,category,city,country,description,address,phone,website,logo_url,listing_status,loyalty_status",
       listing_status: "eq.ACTIVE",
       order: "business_name.asc",
-      limit: "50",
+      limit: "100",
     });
 
     if (q) {
