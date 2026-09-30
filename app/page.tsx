@@ -373,10 +373,20 @@ export default function Home() {
     setLoyaltySyncStatus("Connecting Founder dashboard to GBK Loyalty…");
     try {
       const token = await getLoyaltySession(address);
+      let founderCountry = selectedCountry;
+      try {
+        const current = await loyaltyRequest(token, "my_data", {});
+        const profileCountry = String(current?.profile?.country || "").trim();
+        if (!founderCountry && profileCountry) {
+          founderCountry = profileCountry;
+          setSelectedCountry(profileCountry);
+          window.localStorage.setItem("gbkFounderCountry", profileCountry);
+        }
+      } catch {}
       await loyaltyRequest(token, "profile_upsert", {
         role: "founder",
         full_name: "GBK Founder",
-        country: selectedCountry || null,
+        country: founderCountry || null,
         wallet_address: address,
       });
 
@@ -533,9 +543,11 @@ export default function Home() {
   }
 
   const shortWallet = wallet ? `${wallet.slice(0, 6)}…${wallet.slice(-4)}` : "";
-  const countryMatch = countryOptions.find(([, name]) => name === selectedCountry);
+  const membershipCountry = String(membershipRecord?.country || membershipRecord?.country_name || "").trim();
+  const displayCountry = selectedCountry || membershipCountry;
+  const countryMatch = countryOptions.find(([nameFlag, name]) => name === displayCountry || nameFlag === displayCountry);
   const countryFlag = countryMatch?.[0] || "🏳️";
-  const countryName = countryMatch?.[1] || "Country";
+  const countryName = countryMatch?.[1] || displayCountry || "Country";
   const referralLink = wallet ? `https://app.gbkai.com/?ref=${wallet}` : "";
 
   async function searchBusinesses(overrides: { query?: string; country?: string; city?: string; category?: string } = {}) {
@@ -848,7 +860,7 @@ export default function Home() {
             const tier = membershipTiers[membershipRecord.tier_code as keyof typeof membershipTiers];
             const holdingActive = membershipRecord.holding_status === "active";
             return <div className="membershipDashboard">
-              <div className="membershipIdentity"><span className="membershipBadge">{tier?.scope === "Country" ? countryFlag : "🌍"} {tier?.badge || "FOUNDER"}</span><strong>{tier?.title || membershipRecord.tier_code}</strong><small>{tier?.scope === "Country" ? `${countryName} · ${membershipRecord.price_usd}` : `Global · ${membershipRecord.price_usd}`}</small></div>
+              <div className="membershipIdentity"><span className="membershipBadge">{tier?.scope === "Country" ? countryFlag : "🌍"} {tier?.badge || "FOUNDER"}</span><strong>{tier?.title || membershipRecord.tier_code}</strong><small>{tier?.scope === "Country" ? `${countryName} · ${membershipRecord.price_usd}` : `Global · ${membershipRecord.price_usd}`}</small>{tier?.scope === "Country" && !displayCountry && <small style={{color:"#b45309"}}>Select your Founder country below to show the correct flag and country name.</small>}</div>
               <div className="membershipMeta"><div><span>Scope</span><b>{tier?.scope || "Founder"}</b></div><div><span>Verified Amount</span><b>${membershipRecord.price_usd}</b></div><div><span>GBK Baseline</span><b>{Number(membershipRecord.baseline_gbk_balance).toLocaleString()} GBK</b></div><div><span>Minimum Holding</span><b>{Number(membershipRecord.minimum_gbk_balance).toLocaleString()} GBK</b></div></div>
               <div className="membershipBenefits"><b>{holdingActive ? "Founder benefits active ✓" : "Founder benefits paused"}</b><span>Current GBK: {Number(membershipRecord.current_gbk_balance).toLocaleString()} GBK</span><span>Required: at least 50% of activation baseline</span>{(tier?.benefits || []).map(x=><span key={x}>{holdingActive ? "✓" : "⏸"} {x}</span>)}</div>
               <div className="notice"><b>50% holding rule:</b> activation baseline = {Number(membershipRecord.baseline_gbk_balance).toLocaleString()} GBK; minimum = {Number(membershipRecord.minimum_gbk_balance).toLocaleString()} GBK. Below the minimum, Founder benefits are paused; returning to the minimum reactivates them.</div>
