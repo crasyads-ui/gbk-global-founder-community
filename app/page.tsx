@@ -16,6 +16,7 @@ const nav = [
   ["GBK Swap", SWAP_URL, "↔"],
   ["Referrals", "#referrals", "◎"],
   ["Merchants", "#merchants", "▦"],
+  ["Business Listings", "#business-listings", "🏪"],
   ["Claim Verification", "#business-claims", "🛡️"],
   ["AI Marketplace", "#marketplace", "✦"],
   ["Learn", "/learn", "◈"],
@@ -625,7 +626,7 @@ export default function Home() {
     <div className="coreCard"><b>Founder Type</b><strong>{membershipTiers[membershipRecord.tier_code as keyof typeof membershipTiers]?.title || membershipRecord.tier_code}</strong><small>{membershipTiers[membershipRecord.tier_code as keyof typeof membershipTiers]?.scope || "Founder"} · {membershipRecord.price_usd}</small></div>
     <div className="coreCard"><b>Wallet</b><strong>{shortWallet}</strong><small>Verified Founder wallet</small></div>
     <div className="coreCard"><b>Founder Benefits</b><strong>{membershipRecord.holding_status === "active" ? "ACTIVE ✓" : "PAUSED"}</strong><small>Based on the applicable holding rule</small></div>
-    <div className="coreCard"><b>Founder Workspace</b><a className="primary" href="#founder-referral-network">Open Founder Network →</a><small>Add users and businesses from your Founder workspace.</small></div>
+    <div className="coreCard"><b>🏪 Business Listings Workspace</b><a className="primary" href="#business-listings">Open Business Listings →</a><small>Search the directory, add a business referral, and manage the owner-claim workflow.</small></div>
   </div>
   <div className="notice"><b>✓ No new membership purchase is required.</b> Your existing verified Founder membership is being used.</div>
 </section>}
