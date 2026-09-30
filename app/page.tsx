@@ -886,71 +886,63 @@ export default function Home() {
 
         
 
-        <section className="panel founderNetworkPanel" id="founder-referral-network">
+        <section className="panel founderNetworkPanel" id="founder-referral-network" style={{border:"2px solid #c4b5fd",background:"linear-gradient(135deg,#faf5ff,#ffffff)"}}>
           <div className="panelHead">
-            <div><h3>👥 Founder Referral Network</h3><p>Founder dashboard ↔ GBK Loyalty — add users and businesses without leaving your Founder workspace.</p></div>
-            <span className="badge">CONNECTED</span>
+            <div><h3>👑 Founder — Simple System</h3><p>One simple workflow: add a business, send the owner to GBK Loyalty, and track activation and activity.</p></div>
+            <span className="badge">4 SIMPLE STEPS</span>
           </div>
 
-          <div className="founderNetworkHero">
+          <div className="swapFlow" style={{marginTop:16}}>
+            <div className="swapStep"><span>1</span><b>Connect Founder Wallet</b><small>Your verified Founder wallet identifies your network and referral code.</small></div>
+            <div className="swapArrow">→</div>
+            <div className="swapStep"><span>2</span><b>Add Business</b><small>Enter only the business name, city and country to create the referral record.</small></div>
+            <div className="swapArrow">→</div>
+            <div className="swapStep"><span>3</span><b>Owner Activates</b><small>Business owner opens GBK Loyalty, connects the merchant wallet, adds payment details and accepts terms.</small></div>
+            <div className="swapArrow">→</div>
+            <div className="swapStep"><span>4</span><b>Track Activity</b><small>Active businesses can receive customer orders and GBK AI leads; Founder activity is recorded in the network.</small></div>
+          </div>
+
+          <div className="founderNetworkHero" style={{marginTop:16}}>
             <div>
               <span>YOUR FOUNDER BUSINESS REFERRAL CODE</span>
-              <strong>{founderReferralCode || (wallet ? "Syncing from GBK Loyalty…" : "Connect and verify your Founder wallet")}</strong>
+              <strong>{founderReferralCode || (wallet ? "Syncing…" : "Connect Founder wallet")}</strong>
               <small>{loyaltySyncStatus}</small>
             </div>
             <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
-              <button className="hubBtn" type="button" disabled={!founderReferralCode} onClick={async()=>{if(!founderReferralCode)return;try{await navigator.clipboard.writeText(founderReferralCode);setReferralCopied(true);window.setTimeout(()=>setReferralCopied(false),1800)}catch{}}}>{referralCopied ? "✓ Copied" : "Copy Code"}</button>
-              <button className="primary" type="button" disabled={!wallet||networkBusy} onClick={()=>void syncLoyaltyNetwork(wallet)}>{networkBusy ? "Syncing…" : "↻ Sync Loyalty"}</button>
+              <button className="hubBtn" type="button" disabled={!founderReferralCode} onClick={async()=>{if(!founderReferralCode)return;try{await navigator.clipboard.writeText(founderReferralCode);setReferralCopied(true);window.setTimeout(()=>setReferralCopied(false),1800)}catch{}}}>{referralCopied ? "✓ Copied" : "Copy Referral Code"}</button>
+              <button className="primary" type="button" disabled={!wallet||networkBusy} onClick={()=>void syncLoyaltyNetwork(wallet)}>{networkBusy ? "Syncing…" : "↻ Refresh"}</button>
             </div>
           </div>
 
-          <div className="notice" style={{marginTop:16}}><b>Founder country:</b> <select style={{marginLeft:8}} value={selectedCountry} onChange={e=>{setSelectedCountry(e.target.value);window.localStorage.setItem("gbkFounderCountry",e.target.value);}}><option value="">Select country</option>{countryOptions.map(([flag,name])=><option key={name} value={name}>{flag} {name}</option>)}</select><small style={{display:"block",marginTop:6}}>Required for Country Founder customer and merchant registration.</small></div>
-
-          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))",gap:14,marginTop:16}}>
-            <div className="coreCard" style={{padding:18}}>
-              <div style={{fontSize:26}}>👤</div>
-              <b>Add User to My Network</b>
-              <small>Country Founders can add users in their assigned country. Global Founders can add users globally by selecting a country.</small>
-              <input style={{marginTop:10}} value={founderUserName} onChange={e=>setFounderUserName(e.target.value)} placeholder="User full name"/>
-              <input value={founderUserContact} onChange={e=>setFounderUserContact(e.target.value)} placeholder="Mobile or email"/>
-              <select value={founderUserCountry || selectedCountry} onChange={e=>setFounderUserCountry(e.target.value)}><option value="">Select country</option>{countryOptions.map(([flag,name])=><option key={name} value={name}>{flag} {name}</option>)}</select>
-              <button className="primary" type="button" disabled={!loyaltyConnected||networkBusy} onClick={()=>void addFounderNetworkUser()}>{networkBusy ? "Saving…" : "＋ Add User"}</button>
-            </div>
-
-            <div className="coreCard" style={{padding:18}}>
-              <div style={{fontSize:26}}>🏢</div>
-              <b>Add Business to My Network</b>
-              <small>Businesses appear in your Founder network immediately. Owner activation and funding are required before customer-facing activation.</small>
-              <input style={{marginTop:10}} value={founderBusinessName} onChange={e=>setFounderBusinessName(e.target.value)} placeholder="Business name"/>
-              <select value={founderBusinessCategory} onChange={e=>setFounderBusinessCategory(e.target.value)}>{loyaltyBusinessCategories.map(x=><option key={x}>{x}</option>)}</select>
-              <input value={founderBusinessOwner} onChange={e=>setFounderBusinessOwner(e.target.value)} placeholder="Owner / contact name"/>
-              <input value={founderBusinessContact} onChange={e=>setFounderBusinessContact(e.target.value)} placeholder="Mobile or email"/>
-              <input value={founderBusinessCity} onChange={e=>setFounderBusinessCity(e.target.value)} placeholder="City"/>
-              <select value={founderBusinessCountry || selectedCountry} onChange={e=>setFounderBusinessCountry(e.target.value)}><option value="">Select country</option>{countryOptions.map(([flag,name])=><option key={name} value={name}>{flag} {name}</option>)}</select>
-              <input value={founderBusinessAddress} onChange={e=>setFounderBusinessAddress(e.target.value)} placeholder="Address"/>
-              <input value={founderBusinessWebsite} onChange={e=>setFounderBusinessWebsite(e.target.value)} placeholder="Website (optional)"/>
-              <select value={founderBusinessOffer} onChange={e=>setFounderBusinessOffer(e.target.value)}><option>5%</option><option>10%</option><option>15%</option><option>20%</option></select>
-              <button className="primary" type="button" disabled={!loyaltyConnected||networkBusy} onClick={()=>void addFounderNetworkBusiness()}>{networkBusy ? "Saving…" : "＋ Add Business"}</button>
-            </div>
+          <div className="coreGrid" style={{marginTop:16}}>
+            <div className="coreCard"><b>👥 Users Referred</b><strong>{founderNetwork.users.length}</strong><small>Founder network users</small></div>
+            <div className="coreCard"><b>🏪 Businesses Referred</b><strong>{founderNetwork.businesses.length}</strong><small>Businesses added by you</small></div>
+            <div className="coreCard"><b>🟢 Active Businesses</b><strong>{founderNetwork.businesses.filter((b:any)=>String(b.status||b.loyalty_status||"").toLowerCase()==="active").length}</strong><small>Currently active where status is available</small></div>
+            <div className="coreCard"><b>💰 Founder Rewards</b><strong>Recorded</strong><small>Verified loyalty rewards are tracked by the program</small></div>
           </div>
 
-          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))",gap:14,marginTop:16}}>
-            <div className="offerPreview">
-              <b>👤 My User Referrals ({founderNetwork.users.length})</b>
-              {founderNetwork.users.length===0 ? <span>No users added yet.</span> : founderNetwork.users.slice(0,20).map((u:any)=><div key={u.id} style={{display:"flex",justifyContent:"space-between",gap:10,padding:"9px 0",borderBottom:"1px solid #e5e7eb"}}><strong>{u.referred_name}</strong><span>{u.country} · {u.status}</span></div>)}
+          <div className="coreCard" style={{padding:18,marginTop:16}}>
+            <div style={{display:"flex",justifyContent:"space-between",gap:12,alignItems:"center",flexWrap:"wrap"}}>
+              <div><b style={{fontSize:18}}>🏪 Add Business</b><small style={{display:"block",marginTop:5}}>Add the business once. The owner completes merchant activation in GBK Loyalty.</small></div>
+              <span className="statusPill">OWNER ACTIVATION</span>
             </div>
-            <div className="offerPreview">
-              <b>🏢 My Business Referrals ({founderNetwork.businesses.length})</b>
-              {founderNetwork.businesses.length===0 ? <span>No businesses added yet.</span> : founderNetwork.businesses.slice(0,20).map((b:any)=><div key={b.id} style={{display:"flex",justifyContent:"space-between",gap:10,padding:"9px 0",borderBottom:"1px solid #e5e7eb"}}><strong>{b.business_name}</strong><span>{b.city}, {b.country} · {b.listing_status || "PENDING"}</span></div>)}
+            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:10,marginTop:14}}>
+              <input value={founderBusinessName} onChange={e=>setFounderBusinessName(e.target.value)} placeholder="Business name" aria-label="Business name"/>
+              <input value={founderBusinessCity} onChange={e=>setFounderBusinessCity(e.target.value)} placeholder="City" aria-label="Business city"/>
+              <select value={founderBusinessCountry || selectedCountry} onChange={e=>setFounderBusinessCountry(e.target.value)} aria-label="Business country"><option value="">Select country</option>{countryOptions.map(([flag,name])=><option key={name} value={name}>{flag} {name}</option>)}</select>
+              <select value={founderBusinessCategory} onChange={e=>setFounderBusinessCategory(e.target.value)} aria-label="Business category">{loyaltyBusinessCategories.map(x=><option key={x}>{x}</option>)}</select>
             </div>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:10,marginTop:10}}>
+              <input value={founderBusinessOwner} onChange={e=>setFounderBusinessOwner(e.target.value)} placeholder="Owner name (optional)" aria-label="Owner name"/>
+              <input value={founderBusinessContact} onChange={e=>setFounderBusinessContact(e.target.value)} placeholder="Owner mobile/email (optional)" aria-label="Owner contact"/>
+              <select value={founderBusinessOffer} onChange={e=>setFounderBusinessOffer(e.target.value)} aria-label="Loyalty offer"><option>5%</option><option>10%</option><option>15%</option><option>20%</option></select>
+            </div>
+            <button className="primary" style={{marginTop:12}} type="button" disabled={!wallet||networkBusy} onClick={()=>void addFounderNetworkBusiness()}>{networkBusy ? "Adding…" : "＋ Add Business & Create Referral"}</button>
+            <div className="notice" style={{marginTop:12}}><b>Owner next step:</b> Connect merchant wallet → add UPI/bank/local payment details → accept merchant terms → 🟢 Merchant Active. GBK funding is added when the merchant is ready for reward settlement.</div>
           </div>
 
-          <div className="founderNetworkFlow">
-            <span>FOUNDER</span><i>→</i><span>USER / BUSINESS</span><i>→</i><span>GBK LOYALTY</span><i>→</i><span>QUALIFYING ACTIVITY</span>
-          </div>
-          <div className="notice"><b>Connection rules:</b> Founder membership is verified from the existing Founder membership record for the connected wallet. No new purchase is required. Business registration remains open to everyone; Founder attribution applies when the business is linked to the verified Founder. Country Founder referrals remain country-restricted.</div>
+          <div className="notice" style={{marginTop:16}}><b>Simple Founder rule:</b> Founder adds the business; the business owner activates the merchant account; customers then pay and earn GBK rewards. No Founder approval is required for every customer order.</div>
         </section>
-
         <section className="panel founderBenefits" id="founder-benefits">
           <div className="panelHead">
             <div><h3>👑 Founder Benefits — 3 Core Benefits</h3><p>Holding rewards, Founder referrals, and Business Loyalty participation.</p></div>
