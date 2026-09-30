@@ -732,7 +732,7 @@ export default function Home() {
           <div className="notice"><b>Clear separation:</b> Holding GBK does not automatically make someone a Global Community Founder. Founder membership is a community/ecosystem participation program and does not promise token price appreciation, profits or guaranteed business results.</div>
         </section>
 
-        <section className="panel swapConfirmationPanel" id="swap-confirmation">
+        <section className="panel swapConfirmationPanel" id="swap-confirmation" style={{display: membershipRecord?.status === "active" ? "none" : undefined}}>
           <div className="stepLabel"><span>3</span><div><b>Pay & Verify Your Membership</b><small>Complete the selected amount through GBK Swap, then return here and submit the BSC transaction hash.</small></div></div>
           <div className="panelHead"><div><h3>🔄 BSC Membership Verification</h3><p>Your connected wallet, selected membership and confirmed transaction are checked before activation.</p></div><span className="badge">LIVE VERIFICATION</span></div>
           <div className="swapFlow">
@@ -968,7 +968,7 @@ export default function Home() {
             <div className="simpleArrow">→</div>
             <div className="simpleStep"><span>3</span><b>Pay & Verify</b><small>Confirm the transaction. Verification happens in the background.</small></div>
           </div>
-          <div className="membershipQuickBuy">
+          <div className="membershipQuickBuy" style={{display: membershipRecord?.status === "active" ? "none" : undefined}}>
             <div className="stepLabel"><span>2</span><div><b>Choose Your Founder Membership</b><small>Select one membership level. Your selection will be used for the payment and BSC verification.</small></div></div>
             <div className="quickBuyHead"><div><b>Founder Membership</b><small>Referral code is not required for Founder membership. Use GBK Swap for the membership purchase.</small></div><span className="badge">6 LEVELS</span></div>
             <div className="referralInputRow">
