@@ -628,7 +628,7 @@ export default function Home() {
           </div>
           <div className="hubGrid">
             <div className="hubCard"><b>🏠 Founder Home</b><small>Return to your Founder dashboard and membership status.</small><a className="hubBtn" href="#membership-status">Open Dashboard →</a></div>
-            <div className="hubCard"><b>🏪 Business Listings</b><small>Search approved businesses and open the business listing area.</small><a className="hubBtn" href="#business-listings">Open Directory →</a></div>
+            <div className="hubCard"><b>🏪 Business Listings</b><small>Search approved businesses and open the business listing area.</small><a className="hubBtn" href="/business-listings">Open Directory →</a></div>
             <div className="hubCard"><b>👥 User Opportunities</b><small>Explore current founder, merchant and community opportunities when available.</small><a className="hubBtn" href="#growth-hub">View Opportunities →</a></div>
             <div className="hubCard"><b>📚 Learn</b><small>Spoken English, multilingual learning and digital skills.</small><a className="hubBtn" href="https://learn.gbkai.com" target="_blank" rel="noreferrer">Open Learn ↗</a></div>
             <div className="hubCard"><b>📣 Digital Marketing</b><small>Marketing and content resources for founders and businesses.</small><a className="hubBtn" href="https://market.gbkai.com" target="_blank" rel="noreferrer">Open Marketing ↗</a></div>
