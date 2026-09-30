@@ -157,6 +157,15 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
+    const section = new URLSearchParams(window.location.search).get("section");
+    if (!section) return;
+    const scrollToSection = () => document.getElementById(section)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    const timer = window.setTimeout(scrollToSection, 100);
+    const timer2 = window.setTimeout(scrollToSection, 600);
+    return () => { window.clearTimeout(timer); window.clearTimeout(timer2); };
+  }, []);
+
+  useEffect(() => {
     if (wallet) {
       void refreshMembershipStatus(wallet);
       void syncLoyaltyNetwork(wallet);
