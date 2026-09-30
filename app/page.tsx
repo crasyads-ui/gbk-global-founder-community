@@ -653,10 +653,68 @@ export default function Home() {
     <div className="coreCard"><b>Founder Type</b><strong>{membershipTiers[membershipRecord.tier_code as keyof typeof membershipTiers]?.title || membershipRecord.tier_code}</strong><small>{membershipTiers[membershipRecord.tier_code as keyof typeof membershipTiers]?.scope || "Founder"} · {membershipRecord.price_usd}</small></div>
     <div className="coreCard"><b>Wallet</b><strong>{shortWallet}</strong><small>Verified Founder wallet</small></div>
     <div className="coreCard"><b>Founder Benefits</b><strong>{membershipRecord.holding_status === "active" ? "ACTIVE ✓" : "PAUSED"}</strong><small>Based on the applicable holding rule</small></div>
-    <div className="coreCard"><b>🏪 Business Listings Workspace</b><a className="primary" href="#business-listings">Open Business Listings →</a><small>Search the directory, add a business referral, and manage the owner-claim workflow.</small></div>
+    <div className="coreCard"><b>👑 Founder Business System</b><a className="primary" href="#founder-referral-network">＋ Add Business →</a><small>Add a business after Step 2, create the referral record, and let the owner activate it in GBK Loyalty.</small></div>
   </div>
   <div className="notice"><b>✓ No new membership purchase is required.</b> Your existing verified Founder membership is being used.</div>
 </section>}
+
+<section className="panel founderNetworkPanel" id="founder-referral-network" style={{border:"2px solid #c4b5fd",background:"linear-gradient(135deg,#faf5ff,#ffffff)"}}>
+          <div className="panelHead">
+            <div><h3>👑 Founder — Simple System</h3><p>One simple workflow: add a business, send the owner to GBK Loyalty, and track activation and activity.</p></div>
+            <span className="badge">4 SIMPLE STEPS</span>
+          </div>
+
+          <div className="swapFlow" style={{marginTop:16}}>
+            <div className="swapStep"><span>1</span><b>Connect Founder Wallet</b><small>Your verified Founder wallet identifies your network and referral code.</small></div>
+            <div className="swapArrow">→</div>
+            <div className="swapStep"><span>2</span><b>Add Business</b><small>Enter only the business name, city and country to create the referral record.</small></div>
+            <div className="swapArrow">→</div>
+            <div className="swapStep"><span>3</span><b>Owner Activates</b><small>Business owner opens GBK Loyalty, connects the merchant wallet, adds payment details and accepts terms.</small></div>
+            <div className="swapArrow">→</div>
+            <div className="swapStep"><span>4</span><b>Track Activity</b><small>Active businesses can receive customer orders and GBK AI leads; Founder activity is recorded in the network.</small></div>
+          </div>
+
+          <div className="founderNetworkHero" style={{marginTop:16}}>
+            <div>
+              <span>YOUR FOUNDER BUSINESS REFERRAL CODE</span>
+              <strong>{founderReferralCode || (wallet ? "Syncing…" : "Connect Founder wallet")}</strong>
+              <small>{loyaltySyncStatus}</small>
+            </div>
+            <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+              <button className="hubBtn" type="button" disabled={!founderReferralCode} onClick={async()=>{if(!founderReferralCode)return;try{await navigator.clipboard.writeText(founderReferralCode);setReferralCopied(true);window.setTimeout(()=>setReferralCopied(false),1800)}catch{}}}>{referralCopied ? "✓ Copied" : "Copy Referral Code"}</button>
+              <button className="primary" type="button" disabled={!wallet||networkBusy} onClick={()=>void syncLoyaltyNetwork(wallet)}>{networkBusy ? "Syncing…" : "↻ Refresh"}</button>
+            </div>
+          </div>
+
+          <div className="coreGrid" style={{marginTop:16}}>
+            <div className="coreCard"><b>👥 Users Referred</b><strong>{founderNetwork.users.length}</strong><small>Founder network users</small></div>
+            <div className="coreCard"><b>🏪 Businesses Referred</b><strong>{founderNetwork.businesses.length}</strong><small>Businesses added by you</small></div>
+            <div className="coreCard"><b>🟢 Active Businesses</b><strong>{founderNetwork.businesses.filter((b:any)=>String(b.status||b.loyalty_status||"").toLowerCase()==="active").length}</strong><small>Currently active where status is available</small></div>
+            <div className="coreCard"><b>💰 Founder Rewards</b><strong>Recorded</strong><small>Verified loyalty rewards are tracked by the program</small></div>
+          </div>
+
+          <div className="coreCard" style={{padding:18,marginTop:16}}>
+            <div style={{display:"flex",justifyContent:"space-between",gap:12,alignItems:"center",flexWrap:"wrap"}}>
+              <div><b style={{fontSize:18}}>🏪 Add Business</b><small style={{display:"block",marginTop:5}}>Add the business once. The owner completes merchant activation in GBK Loyalty.</small></div>
+              <span className="statusPill">OWNER ACTIVATION</span>
+            </div>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:10,marginTop:14}}>
+              <input value={founderBusinessName} onChange={e=>setFounderBusinessName(e.target.value)} placeholder="Business name" aria-label="Business name"/>
+              <input value={founderBusinessCity} onChange={e=>setFounderBusinessCity(e.target.value)} placeholder="City" aria-label="Business city"/>
+              <select value={founderBusinessCountry || selectedCountry} onChange={e=>setFounderBusinessCountry(e.target.value)} aria-label="Business country"><option value="">Select country</option>{countryOptions.map(([flag,name])=><option key={name} value={name}>{flag} {name}</option>)}</select>
+              <select value={founderBusinessCategory} onChange={e=>setFounderBusinessCategory(e.target.value)} aria-label="Business category">{loyaltyBusinessCategories.map(x=><option key={x}>{x}</option>)}</select>
+            </div>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:10,marginTop:10}}>
+              <input value={founderBusinessOwner} onChange={e=>setFounderBusinessOwner(e.target.value)} placeholder="Owner name (optional)" aria-label="Owner name"/>
+              <input value={founderBusinessContact} onChange={e=>setFounderBusinessContact(e.target.value)} placeholder="Owner mobile/email (optional)" aria-label="Owner contact"/>
+              <select value={founderBusinessOffer} onChange={e=>setFounderBusinessOffer(e.target.value)} aria-label="Loyalty offer"><option>5%</option><option>10%</option><option>15%</option><option>20%</option></select>
+            </div>
+            <button className="primary" style={{marginTop:12}} type="button" disabled={!wallet||networkBusy} onClick={()=>void addFounderNetworkBusiness()}>{networkBusy ? "Adding…" : "＋ Add Business & Create Referral"}</button>
+            <div className="notice" style={{marginTop:12}}><b>Owner next step:</b> Connect merchant wallet → add UPI/bank/local payment details → accept merchant terms → 🟢 Merchant Active. GBK funding is added when the merchant is ready for reward settlement.</div>
+          </div>
+
+          <div className="notice" style={{marginTop:16}}><b>Simple Founder rule:</b> Founder adds the business; the business owner activates the merchant account; customers then pay and earn GBK rewards. No Founder approval is required for every customer order.</div>
+        </section>
 
 <div className="hero">
           <div>
@@ -886,64 +944,7 @@ export default function Home() {
 
         
 
-        <section className="panel founderNetworkPanel" id="founder-referral-network" style={{border:"2px solid #c4b5fd",background:"linear-gradient(135deg,#faf5ff,#ffffff)"}}>
-          <div className="panelHead">
-            <div><h3>👑 Founder — Simple System</h3><p>One simple workflow: add a business, send the owner to GBK Loyalty, and track activation and activity.</p></div>
-            <span className="badge">4 SIMPLE STEPS</span>
-          </div>
-
-          <div className="swapFlow" style={{marginTop:16}}>
-            <div className="swapStep"><span>1</span><b>Connect Founder Wallet</b><small>Your verified Founder wallet identifies your network and referral code.</small></div>
-            <div className="swapArrow">→</div>
-            <div className="swapStep"><span>2</span><b>Add Business</b><small>Enter only the business name, city and country to create the referral record.</small></div>
-            <div className="swapArrow">→</div>
-            <div className="swapStep"><span>3</span><b>Owner Activates</b><small>Business owner opens GBK Loyalty, connects the merchant wallet, adds payment details and accepts terms.</small></div>
-            <div className="swapArrow">→</div>
-            <div className="swapStep"><span>4</span><b>Track Activity</b><small>Active businesses can receive customer orders and GBK AI leads; Founder activity is recorded in the network.</small></div>
-          </div>
-
-          <div className="founderNetworkHero" style={{marginTop:16}}>
-            <div>
-              <span>YOUR FOUNDER BUSINESS REFERRAL CODE</span>
-              <strong>{founderReferralCode || (wallet ? "Syncing…" : "Connect Founder wallet")}</strong>
-              <small>{loyaltySyncStatus}</small>
-            </div>
-            <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
-              <button className="hubBtn" type="button" disabled={!founderReferralCode} onClick={async()=>{if(!founderReferralCode)return;try{await navigator.clipboard.writeText(founderReferralCode);setReferralCopied(true);window.setTimeout(()=>setReferralCopied(false),1800)}catch{}}}>{referralCopied ? "✓ Copied" : "Copy Referral Code"}</button>
-              <button className="primary" type="button" disabled={!wallet||networkBusy} onClick={()=>void syncLoyaltyNetwork(wallet)}>{networkBusy ? "Syncing…" : "↻ Refresh"}</button>
-            </div>
-          </div>
-
-          <div className="coreGrid" style={{marginTop:16}}>
-            <div className="coreCard"><b>👥 Users Referred</b><strong>{founderNetwork.users.length}</strong><small>Founder network users</small></div>
-            <div className="coreCard"><b>🏪 Businesses Referred</b><strong>{founderNetwork.businesses.length}</strong><small>Businesses added by you</small></div>
-            <div className="coreCard"><b>🟢 Active Businesses</b><strong>{founderNetwork.businesses.filter((b:any)=>String(b.status||b.loyalty_status||"").toLowerCase()==="active").length}</strong><small>Currently active where status is available</small></div>
-            <div className="coreCard"><b>💰 Founder Rewards</b><strong>Recorded</strong><small>Verified loyalty rewards are tracked by the program</small></div>
-          </div>
-
-          <div className="coreCard" style={{padding:18,marginTop:16}}>
-            <div style={{display:"flex",justifyContent:"space-between",gap:12,alignItems:"center",flexWrap:"wrap"}}>
-              <div><b style={{fontSize:18}}>🏪 Add Business</b><small style={{display:"block",marginTop:5}}>Add the business once. The owner completes merchant activation in GBK Loyalty.</small></div>
-              <span className="statusPill">OWNER ACTIVATION</span>
-            </div>
-            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:10,marginTop:14}}>
-              <input value={founderBusinessName} onChange={e=>setFounderBusinessName(e.target.value)} placeholder="Business name" aria-label="Business name"/>
-              <input value={founderBusinessCity} onChange={e=>setFounderBusinessCity(e.target.value)} placeholder="City" aria-label="Business city"/>
-              <select value={founderBusinessCountry || selectedCountry} onChange={e=>setFounderBusinessCountry(e.target.value)} aria-label="Business country"><option value="">Select country</option>{countryOptions.map(([flag,name])=><option key={name} value={name}>{flag} {name}</option>)}</select>
-              <select value={founderBusinessCategory} onChange={e=>setFounderBusinessCategory(e.target.value)} aria-label="Business category">{loyaltyBusinessCategories.map(x=><option key={x}>{x}</option>)}</select>
-            </div>
-            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:10,marginTop:10}}>
-              <input value={founderBusinessOwner} onChange={e=>setFounderBusinessOwner(e.target.value)} placeholder="Owner name (optional)" aria-label="Owner name"/>
-              <input value={founderBusinessContact} onChange={e=>setFounderBusinessContact(e.target.value)} placeholder="Owner mobile/email (optional)" aria-label="Owner contact"/>
-              <select value={founderBusinessOffer} onChange={e=>setFounderBusinessOffer(e.target.value)} aria-label="Loyalty offer"><option>5%</option><option>10%</option><option>15%</option><option>20%</option></select>
-            </div>
-            <button className="primary" style={{marginTop:12}} type="button" disabled={!wallet||networkBusy} onClick={()=>void addFounderNetworkBusiness()}>{networkBusy ? "Adding…" : "＋ Add Business & Create Referral"}</button>
-            <div className="notice" style={{marginTop:12}}><b>Owner next step:</b> Connect merchant wallet → add UPI/bank/local payment details → accept merchant terms → 🟢 Merchant Active. GBK funding is added when the merchant is ready for reward settlement.</div>
-          </div>
-
-          <div className="notice" style={{marginTop:16}}><b>Simple Founder rule:</b> Founder adds the business; the business owner activates the merchant account; customers then pay and earn GBK rewards. No Founder approval is required for every customer order.</div>
-        </section>
-        <section className="panel founderBenefits" id="founder-benefits">
+                <section className="panel founderBenefits" id="founder-benefits">
           <div className="panelHead">
             <div><h3>👑 Founder Benefits — 3 Core Benefits</h3><p>Holding rewards, Founder referrals, and Business Loyalty participation.</p></div>
             <span className="badge">CORE BENEFITS</span>
