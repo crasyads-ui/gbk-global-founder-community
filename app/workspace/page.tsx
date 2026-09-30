@@ -43,8 +43,8 @@ export default function FounderWorkspace() {
             <h2 style={{margin:"6px 0 5px",fontSize:22}}>🏪 Business Listings Workspace</h2>
             <p style={{margin:"0 0 14px",color:"#64748b",lineHeight:1.5}}>Manage the Founder business network without changing the customer-facing active-merchant search.</p>
             <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(190px,1fr))",gap:10}}>
-              <Link href="/#business-listings" style={{padding:"13px 14px",borderRadius:12,background:"#7c3aed",color:"#fff",fontWeight:900,textDecoration:"none"}}>🔎 Business Directory →</Link>
-              <Link href="/#founder-referral-network" style={{padding:"13px 14px",borderRadius:12,background:"#fff",border:"1px solid #ddd6fe",color:"#5b21b6",fontWeight:900,textDecoration:"none"}}>＋ Add / Manage Business →</Link>
+              <a href="/#business-listings" style={{padding:"13px 14px",borderRadius:12,background:"#7c3aed",color:"#fff",fontWeight:900,textDecoration:"none"}}>🔎 Business Directory →</a>
+              <a href="/#founder-referral-network" style={{padding:"13px 14px",borderRadius:12,background:"#fff",border:"1px solid #ddd6fe",color:"#5b21b6",fontWeight:900,textDecoration:"none"}}>＋ Add / Manage Business →</a>
               <a href="https://loyalty.gbkai.com" target="_blank" rel="noreferrer" style={{padding:"13px 14px",borderRadius:12,background:"#fff",border:"1px solid #ddd6fe",color:"#5b21b6",fontWeight:900,textDecoration:"none"}}>🛡️ Merchant / Claim Flow ↗</a>
             </div>
             <small style={{display:"block",marginTop:12,color:"#64748b"}}>Owner claim approval happens through the GBK Loyalty review flow. Activation still requires owner verification, payment details, wallet connection, terms and GBK funding.</small>
