@@ -616,7 +616,21 @@ export default function Home() {
           <div className="notice"><b>Workspace access:</b> this dashboard links to the currently available GBK ecosystem tools. Business listing access, leads and other opportunities remain subject to the applicable program rules and availability.</div>
         </section>
 
-        <div className="hero">
+        {membershipRecord?.status === "active" && <section className="panel" id="verified-founder-dashboard" style={{border:"2px solid #86efac",background:"linear-gradient(135deg,#f0fdf4,#ffffff)"}}>
+  <div className="panelHead">
+    <div><h3>👑 VERIFIED FOUNDER</h3><p>Your Founder membership is active and connected to this wallet.</p></div>
+    <span className="statusPill connected">FOUNDER ACTIVE ✓</span>
+  </div>
+  <div className="coreGrid">
+    <div className="coreCard"><b>Founder Type</b><strong>{membershipTiers[membershipRecord.tier_code as keyof typeof membershipTiers]?.title || membershipRecord.tier_code}</strong><small>{membershipTiers[membershipRecord.tier_code as keyof typeof membershipTiers]?.scope || "Founder"} · {membershipRecord.price_usd}</small></div>
+    <div className="coreCard"><b>Wallet</b><strong>{shortWallet}</strong><small>Verified Founder wallet</small></div>
+    <div className="coreCard"><b>Founder Benefits</b><strong>{membershipRecord.holding_status === "active" ? "ACTIVE ✓" : "PAUSED"}</strong><small>Based on the applicable holding rule</small></div>
+    <div className="coreCard"><b>Founder Workspace</b><a className="primary" href="#founder-referral-network">Open Founder Network →</a><small>Add users and businesses from your Founder workspace.</small></div>
+  </div>
+  <div className="notice"><b>✓ No new membership purchase is required.</b> Your existing verified Founder membership is being used.</div>
+</section>}
+
+<div className="hero">
           <div>
             <div className="pill">● COMMUNITY PLATFORM</div>
             <h2>GBK: Blockchain + AI +<br/><em>Real-World Utility</em></h2>
@@ -933,7 +947,7 @@ export default function Home() {
 <section className="panel founderCore" id="founder-core">
           <div className="panelHead"><div><h3>👤 Founder Core</h3><p>Connect your wallet and prepare your founder profile.</p></div><span className={`statusPill ${wallet ? "connected" : ""}`}>{wallet ? "WALLET CONNECTED" : "NOT CONNECTED"}</span></div>
           <div className="walletConnectBox">
-            <div><b>{wallet ? `Connected: ${shortWallet}` : "Connect your BNB Smart Chain wallet"}</b><small>{wallet ? "Wallet connected. Founder membership still requires separate verification." : "Connect from a wallet app or from any normal browser using the secure WalletConnect selector. BNB Smart Chain is required."}</small></div>
+            <div><b>{wallet ? `Connected: ${shortWallet}` : "Connect your BNB Smart Chain wallet"}</b><small>{wallet ? "Wallet connected. Founder membership verified ✓" : "Connect from a wallet app or from any normal browser using the secure WalletConnect selector. BNB Smart Chain is required."}</small></div>
             <div className="walletActions">{wallet ? <button className="hubBtn" type="button" onClick={disconnectWallet}>Disconnect</button> : <button className="primary" type="button" onClick={connectWallet}>🔗 Connect Wallet</button>}</div>
           </div>
           <div className="walletStatus">{walletStatus}</div>
@@ -961,13 +975,13 @@ export default function Home() {
               </div>
             </>
           )}
-          <div className="simpleFounderFlow">
+          {membershipRecord?.status !== "active" && <div className="simpleFounderFlow">
             <div className="simpleStep"><span>1</span><b>Connect Wallet</b><small>Connect your BNB Smart Chain wallet.</small></div>
             <div className="simpleArrow">→</div>
             <div className="simpleStep"><span>2</span><b>Choose Membership</b><small>Select your Country or Global Founder level.</small></div>
             <div className="simpleArrow">→</div>
             <div className="simpleStep"><span>3</span><b>Pay & Verify</b><small>Confirm the transaction. Verification happens in the background.</small></div>
-          </div>
+          </div>}
           <div className="membershipQuickBuy" style={{display: membershipRecord?.status === "active" ? "none" : undefined}}>
             <div className="stepLabel"><span>2</span><div><b>Choose Your Founder Membership</b><small>Select one membership level. Your selection will be used for the payment and BSC verification.</small></div></div>
             <div className="quickBuyHead"><div><b>Founder Membership</b><small>Referral code is not required for Founder membership. Use GBK Swap for the membership purchase.</small></div><span className="badge">6 LEVELS</span></div>
