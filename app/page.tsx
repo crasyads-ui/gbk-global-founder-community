@@ -647,6 +647,31 @@ export default function Home() {
           </div>
           <div className="notice"><b>Workspace access:</b> this dashboard links to the currently available GBK ecosystem tools. Business listing access, leads and other opportunities remain subject to the applicable program rules and availability.</div>
         </section>
+        <section className="panel" id="referrals" style={{border:"2px solid #8b5cf6",background:"linear-gradient(135deg,#faf5ff,#ffffff)"}}>
+          <div className="panelHead">
+            <div><h3>🔗 Founder Referral</h3><p>Your L1/L2 referral link and Founder business referral code.</p></div>
+            <span className="badge">L1 6% · L2 2%</span>
+          </div>
+          {wallet ? (
+            <div style={{display:"grid",gap:12}}>
+              <div className="notice">
+                <b>👥 L1 / L2 Referral Link</b>
+                <div style={{marginTop:7,wordBreak:"break-all",fontFamily:"monospace"}}>{referralLink}</div>
+                <button className="primary" type="button" style={{marginTop:10}} onClick={copyReferralLink}>
+                  {referralCopied ? "✓ COPIED" : "COPY REFERRAL LINK"}
+                </button>
+              </div>
+              <div className="notice">
+                <b>🏢 Founder Business Referral Code</b>
+                <div style={{marginTop:7,fontSize:18,fontWeight:800}}>{founderReferralCode || "Syncing Founder verification…"}</div>
+                <small style={{display:"block",marginTop:5}}>Use this code when adding/linking a business to your Founder network.</small>
+              </div>
+            </div>
+          ) : (
+            <div className="notice"><b>Connect your Founder wallet</b> to generate and display your referral link and business referral code.</div>
+          )}
+        </section>
+
 
         {membershipRecord?.status === "active" && <section className="panel" id="verified-founder-dashboard" style={{border:"2px solid #86efac",background:"linear-gradient(135deg,#f0fdf4,#ffffff)"}}>
   <div className="panelHead">
